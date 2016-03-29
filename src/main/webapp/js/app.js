@@ -44,7 +44,7 @@
         };
         self.removeProduct = function (id) {
             self.server.removeProductFromCustomer(id, self.customer().username, function () {
-                self.customer().shoppingCart().remove(id);
+                self.customer().shoppingCart.remove(id);
                 if(self.customer().shoppingCart().length<=0)
                     window.location.href = "/";
             });
