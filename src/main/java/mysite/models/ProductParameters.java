@@ -3,6 +3,8 @@ package mysite.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ProductParameters {
     private final String title, category, manufacturer, description, img;
     private final int quantity;
@@ -51,5 +53,37 @@ public class ProductParameters {
 
     public int getPrice() {
         return price;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductParameters{" +
+                "title='" + title + '\'' +
+                ", category='" + category + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", description='" + description + '\'' +
+                ", img='" + img + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductParameters that = (ProductParameters) o;
+        return quantity == that.quantity &&
+                price == that.price &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(category, that.category) &&
+                Objects.equals(manufacturer, that.manufacturer) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(img, that.img);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, category, manufacturer, description, img, quantity, price);
     }
 }

@@ -1,9 +1,47 @@
 (function () {
 
+    var Order = function (data, products) {
+        var self = this;
+        self.products = [];
+        self.createOrder = function (data, products) {
+            if(data.id)
+                self.id = data.id;
+            if(data.dateCreated){
+                var formatter = new Intl.DateTimeFormat("ru", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric"
+                });
+                self.dateCreated = formatter.format(new Date(data.dateCreated));
+            }
+            if(data.dateShipped)
+                self.dateShipped = new Date(data.dateShipped);
+            if(data.productIds && data.productIds){
+                for (var i=0; i<data.productIds.length; i++){
+                    for (var j=0; j<products.length; j++){
+                        if(products[j].id==data.productIds[i]){
+                            self.products.push(products[j]);
+                            break;
+                        }
+                    }
+                }
+            }
+        };
+
+        if(data && products){
+            self.createOrder(data, products);
+        }
+    };
+
     var Customer = function (data) {
         var self = this;
         self.shoppingCart = ko.observableArray([]);
-        
+        self.products = ko.observableArray([]);
+
         self.createCustomer = function (data) {
             if(data.username)
                 self.username = data.username;
@@ -25,6 +63,19 @@
                 }
             }
         };
+
+        self.updateShoppingCart = function (products) {
+            self.products.removeAll();
+            for (var i=0; i<self.shoppingCart().length; i++){
+                for (var j=0; j<products.length; j++){
+                    if(products[j].id==self.shoppingCart()[i]){
+                        self.products.push(products[j]);
+                        break;
+                    }
+                }
+            }
+        };
+
         if(data){
             self.createCustomer(data);
         }
@@ -40,21 +91,31 @@
         self.addProduct = function () {
             self.server.addProductToCustomer(self.selectedProduct().id, self.customer().username, function () {
                 self.customer().shoppingCart.push(self.selectedProduct().id);
+                self.customer().updateShoppingCart(self.products());
             });
         };
-        self.removeProduct = function (id) {
-            self.server.removeProductFromCustomer(id, self.customer().username, function () {
-                self.customer().shoppingCart.remove(id);
+        self.removeProduct = function (product) {
+            self.server.removeProductFromCustomer(product.id, self.customer().username, function () {
+                self.customer().shoppingCart.remove(product.id);
+                self.customer().updateShoppingCart(self.products());
                 if(self.customer().shoppingCart().length<=0)
-                    window.location.href = "/";
+                    window.location.href = "/"; // TODO: переход с сессией
             });
         };
         self.makeOrder = function () {
             self.server.makeOrder(self.customer().username, function () {
                 self.customer().shoppingCart.removeAll();
+                self.customer().updateShoppingCart(self.products());
                 window.location.href = "/";
             });
         };
+        self.server.loadCustomer('Vernon', function (data) {
+            self.customer(new Customer(data));
+        });
+        self.server.loadProducts(function (data) {
+            self.products(data);
+        });
+
     };
 
     var ServerModule = function() {
@@ -110,23 +171,11 @@
         var routes = {
             '/': function () {
                 $('#content').load('/products/list', function () {
-                    self.server.loadProducts(function (data) {
-                        self.appvm.products(data);
-                    });
-                    self.server.loadCustomer('Vernon', function (data) {
-                        self.appvm.customer(new Customer(data));
-                    });
                     ko.applyBindings(self.appvm, document.getElementById("products"));
                 });
             },
             '/products': function () {
                 $('#content').load('/products/list', function () {
-                    self.server.loadProducts(function (data) {
-                        self.appvm.products(data);
-                    });
-                    self.server.loadCustomer('Vernon', function (data) {
-                        self.appvm.customer(new Customer(data));
-                    });
                     ko.applyBindings(self.appvm, document.getElementById("products"));
                 });
             },
@@ -141,13 +190,18 @@
             },
             '/cart': function () {
                 $('#content').load('/products/shoppingCart', function () {
+                    self.appvm.customer().updateShoppingCart(self.appvm.products());
                     ko.applyBindings(self.appvm, document.getElementById("cart"));
                 });
             },
             '/orders': function () {
                 $('#content').load('/orders/load', function () {
                     self.server.loadOrders(self.appvm.customer().username, function (data) {
-                        self.appvm.orders(data);
+                        self.appvm.orders.removeAll();
+                        for(var i =0 ;i<data.length; i++){
+                            self.appvm.orders.push(new Order(data[i], self.appvm.products()))
+                        }
+                        //self.appvm.orders(data);
                         ko.applyBindings(self.appvm, document.getElementById("orders"));
                     });
                 });

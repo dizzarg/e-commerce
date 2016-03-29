@@ -1,12 +1,8 @@
 package mysite.controllers;
 
-import mysite.models.Product;
-import mysite.models.ProductParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/shop")
@@ -28,8 +24,8 @@ public class ShopController extends ApiController{
                                      @RequestParam("userName") String customerUsername,
                                      @RequestParam(value = "amount", required = false) Integer amount) {
         amount = amount==null?1:amount;
-        logger.info("removeProductToCustomer: " + productId + "|"+customerUsername);
-        shopService.removeProductToCustomer(productId, customerUsername, amount);
+        logger.info("removeProductFromCustomer: " + productId + "|"+customerUsername);
+        shopService.removeProductFromCustomer(productId, customerUsername);
     }
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mysite.exception.RepositoryException;
+import mysite.models.Customer;
 import mysite.models.Order;
 import mysite.models.Product;
 import mysite.repository.OrderRepository;
@@ -20,7 +21,7 @@ import java.util.Date;
 @Repository
 public class JdbcOrderRepository implements OrderRepository {
 
-    private static final String INSERT = "INSERT INTO orders (customerUsername, dateCreated, dateShipped, products) VALUES (?,?,?,?);";
+    private static final String INSERT = "INSERT INTO orders (customerUsername, dateCreated, products) VALUES (?,?,?);";
     private static final String FIND_BY_ID = "SELECT customerUsername, dateCreated, dateShipped, products FROM orders where id=?;";
     private static final String FIND_BY_USER_NAME = "SELECT id, dateCreated, dateShipped, products FROM orders where customerUsername=?;";
     private static final String DELETE_BY_ID = "DELETE FROM orders where id=?;";
@@ -30,6 +31,39 @@ public class JdbcOrderRepository implements OrderRepository {
     private DataSource dataSource;
 
     @Override
+    public Order addOrder(Customer customer) throws RepositoryException {
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, customer.getUsername());
+                stmt.setTimestamp(2,  new Timestamp(System.currentTimeMillis()));
+//                if(order.isShipped()){
+//                    stmt.setTimestamp(3, new Timestamp(order.getDateShipped().getTime()));
+//                } else {
+//                    stmt.setNull(3, Types.TIMESTAMP);
+//                }
+                ObjectMapper mapper = new ObjectMapper();
+                String products = null;
+                try {
+                    products = mapper.writeValueAsString(customer.getShoppingCart().getProductIds());
+                } catch (JsonProcessingException e) {
+                    products="[]";
+                }
+                stmt.setString(3, products);
+                stmt.executeUpdate();
+                ResultSet resultSet = stmt.getGeneratedKeys();
+                if(resultSet.next()){
+                    int id = resultSet.getInt(1);
+                    return new Order(id, customer.getUsername(), customer.getShoppingCart().getProductIds());
+                } else {
+                    throw new RepositoryException("Database cannot generate primary key value");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException("Cannot create order",e);
+        }
+    }
+
+//    @Override
     public void addOrder(Order order) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {

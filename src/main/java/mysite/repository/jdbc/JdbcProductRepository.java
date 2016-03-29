@@ -28,17 +28,24 @@ public class JdbcProductRepository implements ProductRepository {
     private DataSource dataSource;
 
     @Override
-    public void addProduct(Product product) throws RepositoryException {
+    public Product addProduct(ProductParameters productParameters) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {
-                stmt.setString(1, product.getTitle());
-                stmt.setString(2, product.getCategory());
-                stmt.setString(3, product.getManufacturer());
-                stmt.setString(4, product.getDescription());
-                stmt.setString(5, product.getImg());
-                stmt.setInt(6, product.getQuantity());
-                stmt.setInt(7, product.getPrice());
+            try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, productParameters.getTitle());
+                stmt.setString(2, productParameters.getCategory());
+                stmt.setString(3, productParameters.getManufacturer());
+                stmt.setString(4, productParameters.getDescription());
+                stmt.setString(5, productParameters.getImg());
+                stmt.setInt(6, productParameters.getQuantity());
+                stmt.setInt(7, productParameters.getPrice());
                 stmt.executeUpdate();
+                ResultSet resultSet = stmt.getGeneratedKeys();
+                if(resultSet.next()){
+                    int id = resultSet.getInt(1);
+                    return new Product(id, productParameters);
+                } else {
+                    throw new RepositoryException("Database cannot generate primary key value");
+                }
             }
         } catch (SQLException e) {
             throw new RepositoryException("Cannot create product",e);
@@ -64,8 +71,7 @@ public class JdbcProductRepository implements ProductRepository {
                         );
                         return new Product(id, param);
                     }
-                    // TODO: моджет стоит бросить исключение
-                    return null;
+                    throw new RepositoryException("Product not found");
                 }
             }
         } catch (SQLException e) {

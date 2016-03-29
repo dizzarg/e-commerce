@@ -2,12 +2,13 @@ package mysite.repository;
 
 import mysite.exception.RepositoryException;
 import mysite.models.Product;
+import mysite.models.ProductParameters;
 
 import java.util.List;
 
 public interface ProductRepository {
 
-    void addProduct(Product product) throws RepositoryException;
+    Product addProduct(ProductParameters productParameters) throws RepositoryException;
 
     Product getProduct(int id) throws RepositoryException;
 
@@ -21,5 +22,4 @@ public interface ProductRepository {
 
     void increaseQuantityOfProductsByOne(List<Integer> ids) throws RepositoryException;
 
-//    int getHighestId() throws RepositoryException;
 }

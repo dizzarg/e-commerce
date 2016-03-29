@@ -5,7 +5,6 @@ import mysite.models.Customer;
 import mysite.models.ShoppingCart;
 import mysite.repository.CustomerRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -18,8 +17,9 @@ import java.util.concurrent.ConcurrentMap;
 @Repository
 public class JdbcCustomerRepository implements CustomerRepository {
 
-    private static final String FIND_ALL = "SELECT username,passwd,email,firstName,lastName,address,phoneNumber FROM customers";
-    private static final String FIND_BY_NAME = "SELECT passwd,email,firstName,lastName,address,phoneNumber FROM customers where username=?";
+    private static final String FIND_ALL = "SELECT id, username,passwd,email,firstName,lastName,address,phoneNumber FROM customers";
+    private static final String FIND_BY_NAME = "SELECT id, passwd,email,firstName,lastName,address,phoneNumber FROM customers where username=?";
+    private static final String EXISTS_BY_NAME = "SELECT id FROM customers where username=?";
     private static final String DELETE_BY_NAME = "DELETE FROM customers where username=?";
     private static final String UPDATE_BY_NAME = "UPDATE customers SET passwd = ?,email = ?,firstName = ?,lastName = ?,address = ?,phoneNumber = ? where username=?";
     private static final String INSERT = "INSERT INTO customers (username,passwd,email,firstName,lastName,address,phoneNumber) VALUES (?,?,?,?,?,?,?);";
@@ -30,7 +30,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
     private DataSource dataSource;
 
     @Override
-    public void addCustomer(Customer customer) throws RepositoryException {
+    public Customer addCustomer(Customer customer) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {
                 stmt.setString(1, customer.getUsername());
@@ -41,7 +41,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
                 stmt.setString(6, customer.getAddress());
                 stmt.setString(7, customer.getPhoneNumber());
                 stmt.executeUpdate();
-                customerCart.put(customer.getUsername(), customer.getShoppingCart());
+                return customer;
             }
         } catch (SQLException e) {
             throw new RepositoryException("Cannot create customer",e);
@@ -55,18 +55,18 @@ public class JdbcCustomerRepository implements CustomerRepository {
                 stmt.setString(1, customerUsername);
                 try (ResultSet resultSet = stmt.executeQuery()) {
                     if (resultSet.next()){
-                        String password = resultSet.getString(1);
-                        String email = resultSet.getString(2);
-                        String firstName = resultSet.getString(3);
-                        String lastName = resultSet.getString(4);
-                        String address = resultSet.getString(5);
-                        String phoneNumber = resultSet.getString(6);
+                        Integer id = resultSet.getInt(1);
+                        String password = resultSet.getString(2);
+                        String email = resultSet.getString(3);
+                        String firstName = resultSet.getString(4);
+                        String lastName = resultSet.getString(5);
+                        String address = resultSet.getString(6);
+                        String phoneNumber = resultSet.getString(7);
                         ShoppingCart cart = customerCart.get(customerUsername);
                         return new Customer(customerUsername, password, email,
                                 firstName,lastName, address, phoneNumber, cart);
                     }
-                    // TODO: моджет стоит бросить исключение
-                    return null;
+                    throw new RepositoryException("Customer not found");
                 }
             }
         } catch (SQLException e) {
@@ -81,13 +81,14 @@ public class JdbcCustomerRepository implements CustomerRepository {
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet resultSet = stmt.executeQuery(FIND_ALL)) {
                     while (resultSet.next()){
-                        String customerUsername = resultSet.getString(1);
-                        String password = resultSet.getString(2);
-                        String email = resultSet.getString(3);
-                        String firstName = resultSet.getString(4);
-                        String lastName = resultSet.getString(5);
-                        String address = resultSet.getString(6);
-                        String phoneNumber = resultSet.getString(7);
+                        Integer id = resultSet.getInt(1);
+                        String customerUsername = resultSet.getString(2);
+                        String password = resultSet.getString(3);
+                        String email = resultSet.getString(4);
+                        String firstName = resultSet.getString(5);
+                        String lastName = resultSet.getString(6);
+                        String address = resultSet.getString(7);
+                        String phoneNumber = resultSet.getString(8);
                         ShoppingCart cart = customerCart.get(customerUsername);
                         Customer customer = new Customer(customerUsername, password,
                                 email,firstName,lastName, address, phoneNumber, cart);
@@ -130,6 +131,20 @@ public class JdbcCustomerRepository implements CustomerRepository {
             }
         } catch (SQLException e) {
             throw new RepositoryException("Cannot remove customer",e);
+        }
+    }
+
+    @Override
+    public boolean existsCustomer(String customerUsername) throws RepositoryException {
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement stmt = conn.prepareStatement(EXISTS_BY_NAME)) {
+                stmt.setString(1, customerUsername);
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    return resultSet.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException("Cannot load customer",e);
         }
     }
 }
