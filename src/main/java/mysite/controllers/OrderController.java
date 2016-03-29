@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController extends ApiController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public Order createOrder(@RequestParam("userName") String customerUsername) {
+    public @ResponseBody Order createOrder(@RequestParam("userName") String customerUsername) {
         return shopService.createOrder(customerUsername);
     }
 

@@ -42,6 +42,7 @@ public class ThymeleafConfig extends WebMvcConfigurerAdapter implements Applicat
         registry.addViewController("/products/product").setViewName("fragments :: product");
         registry.addViewController("/products/shoppingCart").setViewName("fragments :: shoppingCart");
         registry.addViewController("/orders/load").setViewName("fragments :: orders");
+        registry.addViewController("/orders/order").setViewName("fragments :: order");
     }
 
     @Override

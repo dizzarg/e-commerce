@@ -86,6 +86,7 @@
         self.server = serverModule;
         self.products = ko.observableArray([]);
         self.orders = ko.observableArray([]);
+        self.currentOrder = ko.observable();
         self.customer = ko.observable();
         self.selectedProduct = ko.observable();
         self.addProduct = function () {
@@ -102,12 +103,12 @@
                     window.location.href = "/"; // TODO: переход с сессией
             });
         };
-        self.makeOrder = function () {
-            self.server.makeOrder(self.customer().username, function () {
-                self.customer().shoppingCart.removeAll();
-                self.customer().updateShoppingCart(self.products());
-                window.location.href = "/";
-            });
+        self.makeOrder = function (order) {
+            // self.server.createOrder(self.customer().username, function () {
+            //     self.customer().shoppingCart.removeAll();
+            //     self.customer().updateShoppingCart(self.products());
+            //     window.location.href = "/";
+            // });
         };
         self.server.loadCustomer('Vernon', function (data) {
             self.customer(new Customer(data));
@@ -155,10 +156,10 @@
                 }
             });
         };
-        self.makeOrder = function (userName, callback) {
-            $.post('/api/orders',{userName: userName},function () {
+        self.createOrder = function (userName, callback) {
+            $.post('/api/orders',{userName: userName},function (data) {
                 if(callback){
-                    callback()
+                    callback(data)
                 }
             });
         }
@@ -198,12 +199,19 @@
                 $('#content').load('/orders/load', function () {
                     self.server.loadOrders(self.appvm.customer().username, function (data) {
                         self.appvm.orders.removeAll();
-                        for(var i =0 ;i<data.length; i++){
+                        for (var i =0 ;i<data.length; i++) {
                             self.appvm.orders.push(new Order(data[i], self.appvm.products()))
                         }
-                        //self.appvm.orders(data);
                         ko.applyBindings(self.appvm, document.getElementById("orders"));
                     });
+                });
+            },
+            '/orders/create': function () {
+                self.server.createOrder(self.appvm.customer().username, function (data) {
+                    $('#content').load('/orders/order', function () {
+                        self.appvm.currentOrder(new Order(data, self.appvm.products()));
+                        ko.applyBindings(self.appvm, document.getElementById("order"));
+                    });    
                 });
             }
         };

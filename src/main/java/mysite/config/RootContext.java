@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 @ComponentScan(basePackageClasses = Application.class)
 public class RootContext {
 
-//    @Bean(name = "embeddedDataSource")
+    @Bean(name = "embeddedDataSource")
     public DataSource dataSource() {
         // no need shutdown, EmbeddedDatabaseFactoryBean will take care of this
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
@@ -27,7 +27,7 @@ public class RootContext {
                 .build();
     }
 
-    @Bean(name = "mySqlDataSource")
+//    @Bean(name = "mySqlDataSource")
     public DataSource mySqlDataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
