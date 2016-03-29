@@ -14,16 +14,17 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     private HashMap<String, Customer> customers = new HashMap<String, Customer>();
 
     @Override
-    public void addCustomer(Customer customer) throws RepositoryException {
-        if (customers.containsKey(customer.getUsername())) {
+    public Customer addCustomer(Customer customer) throws RepositoryException {
+        if (existsCustomer(customer.getUsername())) {
             throw new RepositoryException("Could not add customer: customer already exists");
         }
         customers.put(customer.getUsername(), customer);
+        return customer;
     }
 
     @Override
     public Customer getCustomer(String username) throws RepositoryException {
-        if (customers.containsKey(username)) {
+        if (existsCustomer(username)) {
             return customers.get(username);
         }
         throw new RepositoryException("Could not get customer: customer does not exist");
@@ -36,7 +37,7 @@ public class InMemoryCustomerRepository implements CustomerRepository {
 
     @Override
     public void updateCustomer(Customer customer) throws RepositoryException {
-        if (customers.containsKey(customer.getUsername())) {
+        if (existsCustomer(customer.getUsername())) {
             customers.replace(customer.getUsername(), customer);
         } else {
             throw new RepositoryException("Could not update customer: customer does not exist");
@@ -45,10 +46,15 @@ public class InMemoryCustomerRepository implements CustomerRepository {
 
     @Override
     public void removeCustomer(String username) throws RepositoryException {
-        if (customers.containsKey(username)) {
+        if (existsCustomer(username)) {
             customers.remove(username);
             return;
         }
         throw new RepositoryException("Could not remove customer: customer does not exist.");
+    }
+
+    @Override
+    public boolean existsCustomer(String username) throws RepositoryException {
+        return customers.containsKey(username);
     }
 }

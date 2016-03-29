@@ -29,9 +29,6 @@ public class ShopService {
 
     private final static Logger logger = LoggerFactory.getLogger(ShopService.class);
 
-    private final AtomicInteger productIDGenerator = new AtomicInteger(0);
-    private final AtomicInteger orderIDGenerator = new AtomicInteger(0);
-
     @Inject
     public ShopService(@Named("jdbcCustomerRepository") CustomerRepository customerRepository,
                        @Named("jdbcProductRepository") ProductRepository productRepository,
@@ -41,34 +38,25 @@ public class ShopService {
         this.orderRepository = orderRepository;
     }
 
-    public  Product addProduct(ProductParameters productParams) {
-        Product newProduct;
+    public Product addProduct(ProductParameters productParams) {
         try {
-            newProduct = new Product(getNextProductId(), productParams);
-            productRepository.addProduct(newProduct);
+            Product product = productRepository.addProduct(productParams);
+            logger.info("Product was loaded");
+            return product;
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not add product: "
-                    + e.getMessage(), e);
+            logger.error("Could not add product: ", e);
+            throw new ShopServiceException("Could not add product: " + e.getMessage(), e);
         }
-        return newProduct;
     }
 
-    // Defaults to quantity: 1 if no amount is provided.
-    public void addProductToCustomer(int productId, String customerUsername) {
-        addProductToCustomer(productId, customerUsername, 1);
-    }
-
-    public void removeProductToCustomer(int productId, String customerUsername, int amount){
+    public void removeProductFromCustomer(int productId, String customerUsername){
         try {
             Customer customer = customerRepository.getCustomer(customerUsername);
-            try {
-                customer.removeProductFromShoppingCart(productId);
-                customerRepository.updateCustomer(customer);
-            } catch (ModelException e) {
-                e.printStackTrace();
-            }
-        } catch (RepositoryException e) {
-            e.printStackTrace();
+            customer.removeProductFromShoppingCart(productId);
+            customerRepository.updateCustomer(customer);
+            logger.info("Product was removed from Customer Shopping cart");
+        } catch (ModelException | RepositoryException e) {
+            logger.error("Could not remove product from Customer Shopping cart: ", e);
             throw new ShopServiceException("Could not add product to customer: " + e.getMessage(), e);
         }
     }
@@ -83,47 +71,52 @@ public class ShopService {
                 }
                 // Make the repository record the changes to customer
                 customerRepository.updateCustomer(customer);
+                logger.info("Product was added to Customer Shopping cart");
+            } else{
+                logger.warn("Cannot add product to Customer Shopping cart");
             }
         } catch (RepositoryException e) {
-            e.printStackTrace();
-            throw new ShopServiceException("Could not add product to customer: " + e.getMessage(), e);
+            logger.error("Cannot add product to Customer Shopping cart", e);
+            throw new ShopServiceException("Could not add product to Customer Shopping cart: " + e.getMessage(), e);
         }
     }
 
     public  Product getProductWithId(int productId) {
         try {
-            return productRepository.getProduct(productId);
+            Product product = productRepository.getProduct(productId);
+            logger.info("Product by id was loaded");
+            return product;
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not getProduct: " + e.getMessage(), e);
+            logger.error("Could not load product", e);
+            throw new ShopServiceException("Could not load product: " + e.getMessage(), e);
         }
     }
 
     public  List<Product> getProducts() {
         try {
-            return productRepository.getProducts();
+            List<Product> products = productRepository.getProducts();
+            logger.info("Products was loaded");
+            return products;
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not get products.: " + e.getMessage(), e);
+            logger.error("Could not load products", e);
+            throw new ShopServiceException("Could not load products.: " + e.getMessage(), e);
         }
     }
 
     public  void removeProduct(int productId) {
         try {
-            try {
-                // If there are any customers first remove the item from their
-                // carts
-                for (Customer c : customerRepository.getCustomers()) {
-                    boolean aProductWasRemoved = c.removeProductsWithIdFromShoppingCart(productId);
-                    if (aProductWasRemoved) {
-                        updateCustomer(c);
-                    }
+            // If there are any customers first remove the item from their
+            // carts
+            for (Customer c : customerRepository.getCustomers()) {
+                boolean aProductWasRemoved = c.removeProductsWithIdFromShoppingCart(productId);
+                if (aProductWasRemoved) {
+                    updateCustomer(c);
                 }
-            } catch (Exception e) {
-                // TODO Be more specific and handle exception
-                // No users in DB - no action needed
             }
-
             productRepository.removeProduct(productId);
-        } catch (RepositoryException e) {
+            logger.info("Product was removed");
+        } catch (ModelException | RepositoryException e) {
+            logger.error("Could not remove product", e);
             throw new ShopServiceException("Could not remove product: " + e.getMessage(), e);
         }
     }
@@ -131,31 +124,43 @@ public class ShopService {
     public  void updateProduct(int productId, ProductParameters productParams) {
         try {
             productRepository.updateProduct(new Product(productId, productParams));
+            logger.info("Product was updated");
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not updateProduct: " + e.getMessage(), e);
+            logger.error("Could not update product", e);
+            throw new ShopServiceException("Could not update Product: " + e.getMessage(), e);
         }
     }
 
-    public  void addCustomer(Customer customer) {
+    public void addCustomer(Customer customer) {
         try {
+            if(customerRepository.existsCustomer(customer.getUsername())){
+                throw new RepositoryException("Customer exists");
+            }
             customerRepository.addCustomer(customer);
+            logger.info("Customer was added");
         } catch (RepositoryException e) {
+            logger.error("Could not add customer", e);
             throw new ShopServiceException("Could not add customer: " + e.getMessage(), e);
         }
     }
 
-    public  Customer getCustomer(String customerUsername) {
+    public Customer getCustomer(String customerUsername) {
         try {
-            return customerRepository.getCustomer(customerUsername);
+            Customer customer = customerRepository.getCustomer(customerUsername);
+            logger.info("Customer was loaded");
+            return customer;
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not get customer: " + e.getMessage(), e);
+            logger.error("Could not load customer", e);
+            throw new ShopServiceException("Could not load customer: " + e.getMessage(), e);
         }
     }
 
-    public  void updateCustomer(Customer customer) {
+    public void updateCustomer(Customer customer) {
         try {
             customerRepository.updateCustomer(customer);
+            logger.info("Customer was updated");
         } catch (RepositoryException e) {
+            logger.error("Could not update customer", e);
             throw new ShopServiceException("Could not update customer: " + e.getMessage(), e);
         }
     }
@@ -163,13 +168,14 @@ public class ShopService {
     public  void removeCustomer(String customerUsername) {
         try {
             customerRepository.removeCustomer(customerUsername);
+            logger.info("Customer was removed");
         } catch (RepositoryException e) {
+            logger.error("Could not remove customer", e);
             throw new ShopServiceException("Could not remove customer: " + e.getMessage(), e);
         }
     }
 
-    public  Order createOrder(String customerUsername) {
-        Order newOrder;
+    public Order createOrder(String customerUsername) {
         try {
             Customer customer = customerRepository.getCustomer(customerUsername);
             ArrayList<Integer> orderedProductIds = customer.getShoppingCart().getProductIds();
@@ -180,52 +186,59 @@ public class ShopService {
             productRepository.decreaseQuantityOfProductsByOne(orderedProductIds);
             try {
                 // place a order containing the products removed from stock
-                int orderId = getNextOrderId();
-                newOrder = new Order(orderId, customerUsername, orderedProductIds);
-                orderRepository.addOrder(newOrder);
+                // TODO: uses transactions
+                Order order = orderRepository.addOrder(customer);
                 try {
                     // clear the customers shopping cart
                     customer.getShoppingCart().clear();
                     customerRepository.updateCustomer(customer);
                 } catch (RepositoryException e) {
-                    orderRepository.removeOrder(orderId);
+                    orderRepository.removeOrder(order.getId());
                     throw e;
                 }
+                logger.info("Order was created");
+                return order;
             } catch (RepositoryException e) {
                 productRepository.increaseQuantityOfProductsByOne(orderedProductIds);
                 throw e;
             }
         } catch (RepositoryException e) {
+            logger.error("Could not create order", e);
             throw new ShopServiceException("Could not create order: " + e.getMessage(), e);
         }
-        return newOrder;
     }
 
     public  Order getOrder(int orderId) {
         try {
             Order order = orderRepository.getOrder(orderId);
+            logger.info("Order was loaded");
             return order;
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not get order: " + e.getMessage(), e);
+            logger.error("Could not load order", e);
+            throw new ShopServiceException("Could not load order: " + e.getMessage(), e);
         }
     }
 
     public  List<Order> getOrders(String customerUsername) {
         try {
-            customerRepository.getCustomer(customerUsername); // Should throw
-            // exception if
-            // user
-            // does not exist
-            return orderRepository.getOrders(customerUsername);
+            if(!customerRepository.existsCustomer(customerUsername)){
+                throw new RepositoryException("Customer does not exist");
+            }
+            List<Order> orders = orderRepository.getOrders(customerUsername);
+            logger.info("Orders was loaded");
+            return orders;
         } catch (RepositoryException e) {
-            throw new ShopServiceException("Could not get orders: " + e.getMessage(), e);
+            logger.error("Could not load orders", e);
+            throw new ShopServiceException("Could not load orders: " + e.getMessage(), e);
         }
     }
 
     public  void updateOrder(Order order) {
         try {
             orderRepository.updateOrder(order);
+            logger.info("Orders was updated");
         } catch (RepositoryException e) {
+            logger.error("Could not update order", e);
             throw new ShopServiceException("Could not update order: " + e.getMessage(), e);
         }
     }
@@ -233,16 +246,11 @@ public class ShopService {
     public  void removeOrder(int orderId) {
         try {
             orderRepository.removeOrder(orderId);
+            logger.info("Orders was removed");
         } catch (RepositoryException e) {
+            logger.error("Could not remove order", e);
             throw new ShopServiceException("Could not remove order: " + e.getMessage(), e);
         }
     }
 
-    private int getNextProductId() {
-        return productIDGenerator.incrementAndGet();
-    }
-
-    private int getNextOrderId() {
-        return orderIDGenerator.incrementAndGet();
-    }
 }

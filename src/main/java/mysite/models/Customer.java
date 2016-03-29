@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import mysite.exception.ModelException;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
 public final class Customer {
     private final String username;
@@ -123,23 +123,22 @@ public final class Customer {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if (other instanceof Customer) {
-            Customer cu = (Customer) other;
-            if (this.getUsername().equals(cu.getUsername())
-                    && this.getPassword().equals(cu.getPassword())
-                    && this.getEmail().equals(cu.getEmail())
-                    && this.getFirstName().equals(cu.getFirstName())
-                    && this.getLastName().equals(cu.getLastName())
-                    && this.getAddress().equals(cu.getAddress())
-                    && this.getPhoneNumber().equals(cu.getPhoneNumber())
-                    && this.getShoppingCart().equals(cu.getShoppingCart())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return Objects.equals(username, customer.username) &&
+                Objects.equals(password, customer.password) &&
+                Objects.equals(email, customer.email) &&
+                Objects.equals(firstName, customer.firstName) &&
+                Objects.equals(lastName, customer.lastName) &&
+                Objects.equals(address, customer.address) &&
+                Objects.equals(phoneNumber, customer.phoneNumber) &&
+                Objects.equals(shoppingCart, customer.shoppingCart);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password, email, firstName, lastName, address, phoneNumber, shoppingCart);
     }
 }

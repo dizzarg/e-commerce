@@ -1,6 +1,7 @@
 package mysite.repository.memory;
 
 import mysite.exception.RepositoryException;
+import mysite.models.Customer;
 import mysite.models.Order;
 import mysite.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
@@ -8,19 +9,18 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class InMemoryOrderRepository implements OrderRepository {
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
+    private final AtomicInteger orderIDGenerator = new AtomicInteger(0);
 
     @Override
-    public void addOrder(Order order) throws RepositoryException {
-        if (orders.containsKey(order.getId())) {
-            throw new RepositoryException("Could not add order: order already exists in repository.");
-        }
+    public Order addOrder(Customer customer) throws RepositoryException {
+        Order order = new Order(orderIDGenerator.incrementAndGet(), customer.getUsername(), customer.getShoppingCart().getProductIds());
         orders.put(order.getId(), order);
-        System.out.println("Order added: " + order.getUsername() + " : "
-                + order.getId() + " : " + order.getProductIds().toString());
+        return order;
     }
 
     @Override

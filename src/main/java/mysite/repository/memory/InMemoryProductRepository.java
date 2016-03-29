@@ -2,23 +2,25 @@ package mysite.repository.memory;
 
 import mysite.exception.RepositoryException;
 import mysite.models.Product;
+import mysite.models.ProductParameters;
 import mysite.repository.ProductRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class InMemoryProductRepository implements ProductRepository {
     private HashMap<Integer, Product> products = new HashMap<Integer, Product>();
+    private final AtomicInteger productIDGenerator = new AtomicInteger(0);
 
     @Override
-    public void addProduct(Product product) throws RepositoryException {
-        if (products.containsKey(product.getId())) {
-            throw new RepositoryException("Cannot get add: product with this id already exist in repository");
-        }
+    public Product addProduct(ProductParameters productParameters) {
+        Product product = new Product(productIDGenerator.incrementAndGet(), productParameters);
         products.put(product.getId(), product);
+        return product;
     }
 
     @Override

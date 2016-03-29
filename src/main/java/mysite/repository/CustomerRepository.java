@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CustomerRepository {
 
-    void addCustomer(Customer customer) throws RepositoryException;
+    Customer addCustomer(Customer customer) throws RepositoryException;
 
     Customer getCustomer(String customerUsername) throws RepositoryException;
 
@@ -16,4 +16,6 @@ public interface CustomerRepository {
     void updateCustomer(Customer customer) throws RepositoryException;
 
     void removeCustomer(String username) throws RepositoryException;
+
+    boolean existsCustomer(String username) throws RepositoryException;
 }
