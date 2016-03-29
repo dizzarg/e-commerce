@@ -4,11 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class Order {
     private final int id;
     private final String customerUsername;
-    private final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private Date dateCreated, dateShipped = null;
     private ArrayList<Integer> productIds = new ArrayList<>();
     private List<OrderItem> items = new ArrayList<>();
@@ -74,20 +74,20 @@ public final class Order {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if (other instanceof Order) {
-            Order o = (Order) other;
-            if (this.getId() == o.getId()
-                    && this.getUsername().equals(o.getUsername())
-                    && this.getProductIds().equals(o.getProductIds())
-                    && sqlDateFormat.format(this.getDateCreated()).equals(sqlDateFormat.format(o.getDateCreated()))
-                    && this.isShipped() == o.isShipped()) {
-                return true;
-            }
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return id == order.id &&
+                Objects.equals(customerUsername, order.customerUsername) &&
+                Objects.equals(dateCreated, order.dateCreated) &&
+                Objects.equals(dateShipped, order.dateShipped) &&
+                Objects.equals(productIds, order.productIds) &&
+                Objects.equals(items, order.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, customerUsername, dateCreated, dateShipped, productIds, items);
     }
 }

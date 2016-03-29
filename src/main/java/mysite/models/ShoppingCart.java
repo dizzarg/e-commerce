@@ -2,9 +2,7 @@ package mysite.models;
 
 import mysite.exception.ModelException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -48,16 +46,15 @@ public class ShoppingCart {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if (other instanceof ShoppingCart) {
-            ShoppingCart sc = (ShoppingCart) other;
-            if (this.getProductIds().equals(sc.getProductIds())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShoppingCart cart = (ShoppingCart) o;
+        return Objects.equals(productIds, cart.productIds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productIds);
     }
 }
