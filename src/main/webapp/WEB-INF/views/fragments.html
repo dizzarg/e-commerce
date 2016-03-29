@@ -18,7 +18,7 @@
     </form>
 </div>
 <div th:fragment="listProduct">
-    <div id="products" data-bind="foreach: products">
+    <div id="products" data-bind="foreach: products()">
         <!-- todo: поправить <div data-bind="css: { row: $index % 3 == 2}">-->
             <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
@@ -34,7 +34,7 @@
     </div>
 </div>
 <div th:fragment="product">
-    <div id="product" data-bind="with: product">
+    <div id="product" data-bind="with: selectedProduct">
         <div class="thumbnail">
             <div class="caption">
                 <h3 data-bind="text: title">Ярлык эскиза</h3>
@@ -48,24 +48,46 @@
     </div>
 </div>
 <div th:fragment="shoppingCart">
-    <div id="cart" data-bind="with: cart">
-        <div class="media" data-bind="foreach: items">
-            <div class="pull-left">
-                <img class="media-object" src="http://placehold.it/64x64">
-                <button data-bind="click: $root.removeProduct" class="btn btn-default" role="button">Убрать</button>
-            </div>
-            <div class="media-body">
-                <h4 class="media-heading" data-bind="text: product.title">Заголовок медиа</h4>
-                <p data-bind="text: product.description">...</p>
+    <div id="cart" data-bind="with: customer">
+        <div class="row" data-bind="foreach: { data: shoppingCart, as: 'id' }">
+            <div class="media">
+                <div class="pull-left">
+                    <img class="media-object" src="http://placehold.it/64x64">
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading" data-bind="text: id">Заголовок медиа</h4>
+                </div>
+                <div class="pull-right">
+                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary">Удалить</button>
+                </div>
             </div>
         </div>
         <div class="media">
             <div class="pull-right">
-                <button type="button" class="btn btn-primary" data-bind="click: $parent.makeOrder">Оплатить</button>
+                <button type="button" data-bind="click: $root.makeOrder" class="btn btn-primary">Оплатить</button>
             </div>
         </div>
     </div>
 </div>
+<!--<div th:fragment="shoppingCart1">-->
+    <!--<div id="cart" data-bind="with: cart">-->
+        <!--<div class="media" data-bind="foreach: items">-->
+            <!--<div class="pull-left">-->
+                <!--<img class="media-object" src="http://placehold.it/64x64">-->
+                <!--<button data-bind="click: $root.removeProduct" class="btn btn-default" role="button">Убрать</button>-->
+            <!--</div>-->
+            <!--<div class="media-body">-->
+                <!--<h4 class="media-heading" data-bind="text: product.title">Заголовок медиа</h4>-->
+                <!--<p data-bind="text: product.description">...</p>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="media">-->
+            <!--<div class="pull-right">-->
+                <!--<button type="button" class="btn btn-primary" data-bind="click: $parent.makeOrder">Оплатить</button>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
 <div th:fragment="orders">
     <div id="orders">
         <h3>Заказы</h3>

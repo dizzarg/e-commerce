@@ -1,163 +1,165 @@
 (function () {
 
-    var Server = function() {
+    var Customer = function (data) {
         var self = this;
-        self.loadProducts = function (callback) {
-            $('#content').load('/products/list', function () {
-               if(callback)
-                   callback();
-            });
-        };
-    };
-
-    var server = new Server();
-
-    var index = function () {
-        server.loadProducts(function () {
-                applicationViewModel.loadAll();
-                // Загружать посте авторизации или верификации пользователя
-                applicationViewModel.loadCustomer(function () {
-                    ko.cleanNode(document.getElementById('main-navbar'));
-                    ko.applyBindings(applicationViewModel);
-                });
-        });
-    };
-    var products = function () {
-        $('#content').load('/products/list', function () {
-            applicationViewModel.loadAll();
-            ko.applyBindings(applicationViewModel, document.getElementById("products"));
-        });
-    };
-    var product = function (productId) {
-        $('#content').load('/products/product', function () {
-            applicationViewModel.getProduct(productId);
-            ko.applyBindings(applicationViewModel, document.getElementById("product"));
-        });
-    };
-    var shoppingCart = function () {
-        $('#content').load('/products/shoppingCart', function () {
-            if(applicationViewModel.products().length == 0){
-                applicationViewModel.loadAll();
+        self.shoppingCart = ko.observableArray([]);
+        
+        self.createCustomer = function (data) {
+            if(data.username)
+                self.username = data.username;
+            if(data.password)
+                self.password = data.password;
+            if(data.email)
+                self.email = data.email;
+            if(data.firstName)
+                self.firstName = data.firstName;
+            if(data.lastName)
+                self.lastName = data.lastName;
+            if(data.address)
+                self.address = data.address;
+            if(data.phoneNumber)
+                self.phoneNumber = data.phoneNumber;
+            if(data.shoppingCart && data.shoppingCart.productIds){
+                for (var i=0; i<data.shoppingCart.productIds.length; i++){
+                    self.shoppingCart.push(data.shoppingCart.productIds[i])
+                }
             }
-            applicationViewModel.loadCustomer(function () {
-                ko.applyBindings(applicationViewModel, document.getElementById("cart"));
-            });
-        });
-    };
-    var orders = function () {
-        $('#content').load('/orders/load', function () {
-            applicationViewModel.loadOrders();
-            ko.applyBindings(applicationViewModel, document.getElementById("orders"));
-        });
-    };
-    var addProduct = function () {
-        $('#content').load('/products/add', function () {
-
-        });
-    };
-    var logout = function () {
-
-    };
-    var profile = function () {
-
-    };
-    var routes = {
-        '/': [index],
-        '/products': [products],
-        '/product/:id': [product],
-        '/cart': [shoppingCart],
-        '/logout': [logout],
-        '/orders': [orders],
-        '/profile': [profile]
-    };
-
-    var router = Router(routes);
-
-    var ShoppingCartModel = function () {
-        var self = this;
-        self.items = ko.observableArray([]);
-        self.add = function (item, callback) {
-            $.post('/api/shop/add',{productId: item.product.id, userName: 'Vernon', amount: 1}, function (data) {
-                self.items.push(item);
-                if(callback)
-                    callback();
-            });
         };
-        self.remove = function (item, callback) {
-            $.post('/api/shop/remove',{productId: item.product.id, userName: 'Vernon', amount: 1}, function (data) {
-                self.items.remove(function (el) { return item.product.id == el.product.id; });
-                if(callback)
-                    callback();
-            });
-        };
-        self.clean = function () {
-            self.items.removeAll();
-            window.location.href = "/";
+        if(data){
+            self.createCustomer(data);
         }
     };
 
-    var ApplicationViewModel = function() {
+    var ApplicationVM = function (serverModule) {
         var self = this;
+        self.server = serverModule;
         self.products = ko.observableArray([]);
         self.orders = ko.observableArray([]);
-        self.cart = ko.observable(new ShoppingCartModel());
-        self.product = ko.observable();
+        self.customer = ko.observable();
+        self.selectedProduct = ko.observable();
         self.addProduct = function () {
-            self.cart().add({product: self.product(), count: 1}, function () {
-                ko.cleanNode(document.getElementById('main-navbar'));
-                ko.applyBindings(applicationViewModel, document.getElementById('main-navbar'));
+            self.server.addProductToCustomer(self.selectedProduct().id, self.customer().username, function () {
+                self.customer().shoppingCart.push(self.selectedProduct().id);
             });
         };
-        self.removeProduct = function () {
-            self.cart().remove({product: self.product(), count: 1}, function () {
-                ko.cleanNode(document.getElementById('main-navbar'));
-                ko.applyBindings(applicationViewModel);
+        self.removeProduct = function (id) {
+            self.server.removeProductFromCustomer(id, self.customer().username, function () {
+                self.customer().shoppingCart().remove(id);
+                if(self.customer().shoppingCart().length<=0)
+                    window.location.href = "/";
             });
-        };
-        self.getProduct = function (id) {
-            var prod = ko.utils.arrayFirst(self.products(), function (item) {
-                return item.id == id;
-            });
-            self.product = ko.observable(prod);
         };
         self.makeOrder = function () {
-            $.post('/api/orders',{userName: 'Vernon'},function () {
-                self.cart().clean();
-            });
-        };
-        self.loadCustomer = function(callback){
-            $.getJSON('/api/customers/Vernon', function (data) {
-                var prods = data.shoppingCart.productIds;
-                var shoppingCartModel = new ShoppingCartModel();
-                for (var j=0; j<prods.length; j++){
-                    for(var i=0; i<self.products().length; i++) {
-                        if (self.products()[i].id == prods[j]) {
-                            shoppingCartModel.items().push({product: self.products()[i], count: 1});
-                            break;
-                        }
-                    }
-                }
-                self.cart = ko.observable(shoppingCartModel);
-                if(callback){
-                    callback();
-                }
-            });
-        };
-        self.loadAll = function(){
-            $.getJSON('/api/products', function (data) {
-                self.products(data);
-            });
-        };
-        self.loadOrders = function(){
-            $.getJSON('/api/customers/Vernon/orders', function (data) {
-                self.orders(data);
+            self.server.makeOrder(self.customer().username, function () {
+                self.customer().shoppingCart.removeAll();
+                window.location.href = "/";
             });
         };
     };
-    var applicationViewModel = new ApplicationViewModel();
-    ko.applyBindings(applicationViewModel, document.getElementById('main-navbar'));
 
-    router.init('#/');
+    var ServerModule = function() {
+        var self = this;
+        self.loadProducts = function (callback) {
+            $.getJSON('/api/products', function (data) {
+                if(callback){
+                    callback(data)
+                }
+            });
+        };
+        self.loadCustomer = function (userName, callback) {
+            $.getJSON('/api/customers/'+userName, function (data) {
+                if(callback){
+                    callback(data)
+                }
+            });
+        };
+        self.loadOrders = function (userName, callback) {
+            $.getJSON('/api/customers/'+userName+'/orders', function (data) {
+                if(callback){
+                    callback(data)
+                }
+            });
+        };
+        self.addProductToCustomer = function (id, userName, callback) {
+            $.post('/api/shop/add',{productId: id, userName: userName, amount: 1}, function () {
+                if(callback){
+                    callback()
+                }
+            });
+        };
+        self.removeProductFromCustomer = function (id, userName, callback) {
+            $.post('/api/shop/remove',{productId: id, userName: userName, amount: 1}, function () {
+                if(callback){
+                    callback()
+                }
+            });
+        };
+        self.makeOrder = function (userName, callback) {
+            $.post('/api/orders',{userName: userName},function () {
+                if(callback){
+                    callback()
+                }
+            });
+        }
+    };
+
+    var ApplicationModule = function () {
+        var self = this;
+        self.server = new ServerModule();
+        self.appvm = new ApplicationVM(self.server);
+        var routes = {
+            '/': function () {
+                $('#content').load('/products/list', function () {
+                    self.server.loadProducts(function (data) {
+                        self.appvm.products(data);
+                    });
+                    self.server.loadCustomer('Vernon', function (data) {
+                        self.appvm.customer(new Customer(data));
+                    });
+                    ko.applyBindings(self.appvm, document.getElementById("products"));
+                });
+            },
+            '/products': function () {
+                $('#content').load('/products/list', function () {
+                    self.server.loadProducts(function (data) {
+                        self.appvm.products(data);
+                    });
+                    self.server.loadCustomer('Vernon', function (data) {
+                        self.appvm.customer(new Customer(data));
+                    });
+                    ko.applyBindings(self.appvm, document.getElementById("products"));
+                });
+            },
+            '/product/:id': function (id) {
+                $('#content').load('/products/product', function () {
+                    var prod = ko.utils.arrayFirst(self.appvm.products(), function (item) {
+                        return item.id == id;
+                    });
+                    self.appvm.selectedProduct(prod);
+                    ko.applyBindings(self.appvm, document.getElementById("product"));
+                });
+            },
+            '/cart': function () {
+                $('#content').load('/products/shoppingCart', function () {
+                    ko.applyBindings(self.appvm, document.getElementById("cart"));
+                });
+            },
+            '/orders': function () {
+                $('#content').load('/orders/load', function () {
+                    self.server.loadOrders(self.appvm.customer().username, function (data) {
+                        self.appvm.orders(data);
+                        ko.applyBindings(self.appvm, document.getElementById("orders"));
+                    });
+                });
+            }
+        };
+        ko.applyBindings(self.appvm);
+        var router = Router(routes);
+        router.init('#/');
+    };
+    
+    new ApplicationModule();
+
     $('li').on('click', function () {
         $('.active').removeClass('active');
         $(this).addClass('active');
