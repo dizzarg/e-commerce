@@ -31,7 +31,7 @@
                     <ul class="nav navbar-nav navbar-right" data-bind="with: customer">
                         <li data-bind="visible: shoppingCart().length > 0" ><a href="#/cart">Корзина<span class="badge" data-bind="text: shoppingCart().length">100</span></a></li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><!--ko text: username-->Пользователь<!--/ko--> <b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i><!--ko text: username-->Пользователь<!--/ko--> <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li><a aria-selected="false" href="#/profile">Профиль</a></li>
                                 <li><a aria-selected="false"href="#/orders">Заказы</a></li>
@@ -46,7 +46,7 @@
         <div class="container">
             <div id="search" class="row">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Text input">
+                    <input type="text" class="form-control" placeholder="Введите наименование товара или услуги">
                     <div class="input-group-btn">
                         <button class="btn btn-default" aria-hidden="true">
                             <i class="glyphicon glyphicon-search"></i>

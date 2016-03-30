@@ -65,6 +65,8 @@
                 </div>
                 <div class="media-body">
                     <h4 class="media-heading" data-bind="text: title">Заголовок медиа</h4>
+                    <p data-bind="text: fullDescription">...</p>
+                    <p data-bind="text: price"></p>
                 </div>
                 <div class="pull-right">
                     <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary">Удалить</button>
@@ -72,6 +74,11 @@
             </div>
         </div>
         <div class="media">
+            <div class="media-body">
+                <h4 class="media-heading">
+                     Итого: <span data-bind="text: totalPrice">0</span>
+                </h4>
+            </div>
             <div class="pull-right">
                 <a href="#/orders/create" class="btn btn-primary">Сделать заказ</a>
             </div>

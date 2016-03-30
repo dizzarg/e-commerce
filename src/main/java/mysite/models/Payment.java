@@ -2,14 +2,55 @@ package mysite.models;
 
 import java.util.Objects;
 
+
+
 public class Payment {
 
     private Integer id;
     private Order order;
     private Long amount;
+    private Status status;
     private String expiration;
     private String number;
     private String cvv;
+
+    /**
+     * <ul>
+     *  <li>Ожидает оплату</li>
+     *  <li>Готов к отправке</li>
+     *  <li>Отправлен</li>
+     *  <li>Платеж зачислен</li>
+     *  <li>Отменен, деньги возвращены</li>
+     *  <li>Неверный номер</li>
+     *  <li>Ошибка платежа</li>
+     *  <li>Платеж оплачен</li>
+     *  <li>Платеж возвращен</li>
+     *  <li>В процессе оплаты</li>
+     * </ul>
+     */
+    public enum Status {
+        WAITTING("Ожидает оплату"),
+        READY("Готов к отправке"),
+        SENDED("Отправлен"),
+        CREDITED("Платеж зачислен"),
+        CANSELED("Отменен, деньги возвращены"),
+        INVALID_NUMBER("Неверный номер"),
+        ERROR("Ошибка платежа"),
+        PAID("Платеж оплачен"),
+        RETURNED("Платеж возвращен"),
+        INPROGRESS("В процессе оплаты");
+
+        private final String message;
+
+        Status(String s) {
+            this.message = s;
+        }
+
+        @Override
+        public String toString() {
+            return message;
+        }
+    }
 
     public Integer getId() {
         return id;
@@ -25,6 +66,14 @@ public class Payment {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public Long getAmount() {

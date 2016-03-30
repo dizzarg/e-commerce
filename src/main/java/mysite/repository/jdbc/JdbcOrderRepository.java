@@ -6,10 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import mysite.exception.RepositoryException;
 import mysite.models.Customer;
 import mysite.models.Order;
-import mysite.models.Product;
 import mysite.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -25,7 +23,7 @@ public class JdbcOrderRepository implements OrderRepository {
     private static final String FIND_BY_ID = "SELECT customerUsername, dateCreated, dateShipped, products FROM orders where id=?;";
     private static final String FIND_BY_USER_NAME = "SELECT id, dateCreated, dateShipped, products FROM orders where customerUsername=?;";
     private static final String DELETE_BY_ID = "DELETE FROM orders where id=?;";
-    private static final String UPDATE_BY_ID = "UPDATE orders SET customerUsername = ?, dateCreated = ?, dateShipped = ?, products = ? where id=?;";
+    private static final String UPDATE_BY_ID = "UPDATE orders SET customerUsername = ?, dateCreated = ?, dateShipped = ? where id=?;";
 
     @Inject
     private DataSource dataSource;
@@ -36,11 +34,6 @@ public class JdbcOrderRepository implements OrderRepository {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, customer.getUsername());
                 stmt.setTimestamp(2,  new Timestamp(System.currentTimeMillis()));
-//                if(order.isShipped()){
-//                    stmt.setTimestamp(3, new Timestamp(order.getDateShipped().getTime()));
-//                } else {
-//                    stmt.setNull(3, Types.TIMESTAMP);
-//                }
                 ObjectMapper mapper = new ObjectMapper();
                 String products = null;
                 try {
@@ -168,12 +161,14 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
-    public void updateOrder(Order newOrder) throws RepositoryException {
+    public void updateOrder(Order order) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(UPDATE_BY_ID)) {
-                stmt.setString(1, newOrder.getUsername());
-                stmt.setTimestamp(2, new Timestamp(newOrder.getDateCreated().getTime()));
-                stmt.setString(3, newOrder.getProductIds().toString());
+                stmt.setString(1, order.getUsername());
+                stmt.setTimestamp(2, new Timestamp(order.getDateCreated().getTime()));
+                stmt.setTimestamp(3, new Timestamp(order.getDateShipped().getTime()));
+//                stmt.setString(4, order.getProductIds().toString());
+                stmt.setInt(4, order.getId());
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {

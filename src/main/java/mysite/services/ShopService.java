@@ -6,6 +6,7 @@ import mysite.exception.ShopServiceException;
 import mysite.models.*;
 import mysite.repository.CustomerRepository;
 import mysite.repository.OrderRepository;
+import mysite.repository.PaymentRepository;
 import mysite.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,16 +24,19 @@ public class ShopService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
     private final static Logger logger = LoggerFactory.getLogger(ShopService.class);
 
     @Inject
     public ShopService(@Named("jdbcCustomerRepository") CustomerRepository customerRepository,
                        @Named("jdbcProductRepository") ProductRepository productRepository,
-                       @Named("jdbcOrderRepository") OrderRepository orderRepository) {
+                       @Named("jdbcOrderRepository") OrderRepository orderRepository,
+                       PaymentRepository paymentRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public Product addProduct(ProductContext productParams) {
@@ -172,8 +176,16 @@ public class ShopService {
         }
     }
 
-    public Payment createPayment(){
-        return null;
+    public Payment createPayment(Integer orderId){
+        try{
+            Order order = orderRepository.getOrder(orderId);
+            order.shipIt();
+            orderRepository.updateOrder(order);
+            return paymentRepository.addPayment(new PaymentContext(order));
+        } catch (RepositoryException ex){
+            logger.error("Cannot create payment", ex);
+            throw new ShopServiceException("Cannot create payment", ex);
+        }
     }
 
     public Order createOrder(String customerUsername) {
