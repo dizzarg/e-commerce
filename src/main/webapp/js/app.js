@@ -37,6 +37,41 @@
         }
     };
 
+    var Product = function (data) {
+        var self = this;
+        self.createProduct = function (data) {
+            if(data.id)
+                self.id = data.id;
+            if(data.title)
+                self.title = data.title;
+            if(data.category)
+                self.category = data.category;
+            if(data.manufacturer)
+                self.manufacturer = data.manufacturer;
+            if(data.description){
+                self.fullDescription = data.description;
+                if(data.description.length > 120){
+                    self.shortDescription = data.description.substring(0, 120) + '...';
+                } else {
+                    self.shortDescription = data.description;
+                }
+            }
+            if(data.img)
+                self.img = data.img;
+            if(data.price) {
+                var formatter = new Intl.NumberFormat("ru", {
+                    style: "currency",
+                    currency: "RUB",
+                    minimumFractionDigits: 2
+                });
+                self.price = formatter.format(data.price/100);
+            }
+        };
+        if(data){
+            self.createProduct(data);
+        }
+    };
+
     var Customer = function (data) {
         var self = this;
         self.shoppingCart = ko.observableArray([]);
@@ -103,7 +138,8 @@
                     window.location.href = "/"; // TODO: переход с сессией
             });
         };
-        self.makeOrder = function (order) {
+        self.createPayment = function (order) {
+
             // self.server.createOrder(self.customer().username, function () {
             //     self.customer().shoppingCart.removeAll();
             //     self.customer().updateShoppingCart(self.products());
@@ -114,7 +150,12 @@
             self.customer(new Customer(data));
         });
         self.server.loadProducts(function (data) {
-            self.products(data);
+            // console.log(data.length);
+            for (var i=0; i<data.length; i++){
+                var product = new Product(data[i]);
+                self.products.push(product);
+            }
+            // self.products(data);
         });
 
     };
@@ -185,6 +226,7 @@
                     var prod = ko.utils.arrayFirst(self.appvm.products(), function (item) {
                         return item.id == id;
                     });
+                    
                     self.appvm.selectedProduct(prod);
                     ko.applyBindings(self.appvm, document.getElementById("product"));
                 });

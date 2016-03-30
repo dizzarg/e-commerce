@@ -18,15 +18,19 @@
     </form>
 </div>
 <div th:fragment="listProduct">
-    <div id="products" data-bind="foreach: products()">
+    <div id="products" data-bind="foreach: products">
         <!-- todo: поправить <div data-bind="css: { row: $index % 3 == 2}">-->
             <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
-                    <img data-bind="attr: { 'src': img, 'alt': title }"/>
+                    <img data-bind="attr: { 'src': 'http://placehold.it/300x200?text='+title, 'alt': title }"/>
                     <div class="caption">
                         <h3 data-bind="text: title">Ярлык эскиза</h3>
-                        <p data-bind="text: description">...</p>
-                        <p><a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default" role="button">Подробнее</a></p>
+                        <p data-bind="text: shortDescription">...</p>
+                        <p data-bind="text: price">...</p>
+                        <p>
+                            <a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default" role="button">Подробнее</a>
+                            <a data-bind="click: $parent.addProduct" class="btn btn-default" role="button">Добавить в корзину</a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -34,12 +38,13 @@
     </div>
 </div>
 <div th:fragment="product">
-    <div id="product" data-bind="with: selectedProduct">
+    <div id="product" data-bind="with: selectedProduct()">
         <div class="thumbnail">
             <div class="caption">
                 <h3 data-bind="text: title">Ярлык эскиза</h3>
-                <img data-bind="attr: { 'src': img, 'alt': title }"/>
-                <p data-bind="text: description">...</p>
+                <img data-bind="attr: { 'src': 'http://placehold.it/300x200?text='+title, 'alt': title }"/>
+                <p data-bind="text: fullDescription">...</p>
+                <p data-bind="text: price">...</p>
                 <p>
                     <a data-bind="click: $parent.addProduct" class="btn btn-default" role="button">Добавить в корзину</a>
                 </p>
@@ -48,12 +53,15 @@
     </div>
 </div>
 <div th:fragment="shoppingCart">
-    <h3>Карзина</h3>
+    <h3>Корзина платежей</h3>
+    <p>
+        Корзина позволяет оплатить несколько услуг, вводя данные банковской карты один раз. Для оплаты добавленных платежей, отметьте их галочкой. После этого переходите к оплате, нажав на кнопку «Оплатить».
+    </p>
     <div id="cart" data-bind="with: customer">
         <div class="row" data-bind="foreach: products">
             <div class="media">
                 <div class="pull-left">
-                    <img class="media-object" src="http://placehold.it/64x64">
+                    <img class="media-object" data-bind="attr: { 'src': 'http://placehold.it/64x64?text='+title, 'alt': title }">
                 </div>
                 <div class="media-body">
                     <h4 class="media-heading" data-bind="text: title">Заголовок медиа</h4>
@@ -92,7 +100,7 @@
     <div id="order">
         <h3>Мой заказ</h3>
         <div class="panel panel-default" data-bind="with: currentOrder">
-            <div class="panel-heading" data-bind="text: 'Заказ #'+id+' был создан в(о) +'+dateCreated">title</div>
+            <div class="panel-heading" data-bind="text: 'Заказ #'+id+' был создан в(о) '+dateCreated">title</div>
             <div class="panel-body">
                 <h4>Содержимое заказа</h4>
                 <ul class="list-group" data-bind="foreach: products">
@@ -100,25 +108,23 @@
                         <span class="badge">1</span>
                     </li>
                 </ul>
-                <div class="row">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <h4>Детали платежа</h4>
-                            <input class="form-control" type="text" value="4111 1111 1111 1111"/>
-                            <div class="form-inline">
-                                <div class="form-group">
-                                    <label for="expDate">Дата</label>
-                                    <input type="text" class="form-control" id="expDate" name="expDate" placeholder="03/2020">
-                                </div>
-                                <div class="form-group">
-                                    <label for="cvvcvc">CVV/CVC</label>
-                                    <input type="password" class="form-control" id="cvvcvc" name="cvvcvc" placeholder="">
-                                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h4>Детали платежа</h4>
+                        <input class="form-control" type="text" value="4111 1111 1111 1111"/>
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label for="expDate">Дата</label>
+                                <input type="text" class="form-control" id="expDate" name="expDate" placeholder="03/2020">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvvcvc">CVV/CVC</label>
+                                <input type="password" class="form-control" id="cvvcvc" name="cvvcvc" placeholder="">
                             </div>
                         </div>
                     </div>
                 </div>
-                <button type="button" data-bind="click: $root.makeOrder" class="btn btn-primary">Оплатить</button>
+                <button type="button" data-bind="click: $root.createPayment" class="btn btn-primary">Оплатить</button>
             </div>
         </div>
     </div>

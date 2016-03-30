@@ -3,10 +3,7 @@ package mysite.services;
 import mysite.exception.ModelException;
 import mysite.exception.RepositoryException;
 import mysite.exception.ShopServiceException;
-import mysite.models.Customer;
-import mysite.models.Order;
-import mysite.models.Product;
-import mysite.models.ProductParameters;
+import mysite.models.*;
 import mysite.repository.CustomerRepository;
 import mysite.repository.OrderRepository;
 import mysite.repository.ProductRepository;
@@ -173,6 +170,10 @@ public class ShopService {
             logger.error("Could not remove customer", e);
             throw new ShopServiceException("Could not remove customer: " + e.getMessage(), e);
         }
+    }
+
+    public Payment createPayment(){
+        return null;
     }
 
     public Order createOrder(String customerUsername) {
