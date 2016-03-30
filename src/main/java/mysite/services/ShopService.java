@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@Transactional
 public class ShopService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
