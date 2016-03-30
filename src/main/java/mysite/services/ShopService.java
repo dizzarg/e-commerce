@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Transactional
@@ -36,7 +35,7 @@ public class ShopService {
         this.orderRepository = orderRepository;
     }
 
-    public Product addProduct(ProductParameters productParams) {
+    public Product addProduct(ProductContext productParams) {
         try {
             Product product = productRepository.addProduct(productParams);
             logger.info("Product was loaded");
@@ -119,7 +118,7 @@ public class ShopService {
         }
     }
 
-    public  void updateProduct(int productId, ProductParameters productParams) {
+    public  void updateProduct(int productId, ProductContext productParams) {
         try {
             productRepository.updateProduct(new Product(productId, productParams));
             logger.info("Product was updated");

@@ -2,13 +2,13 @@ package mysite.repository;
 
 import mysite.exception.RepositoryException;
 import mysite.models.Product;
-import mysite.models.ProductParameters;
+import mysite.models.ProductContext;
 
 import java.util.List;
 
 public interface ProductRepository {
 
-    Product addProduct(ProductParameters productParameters) throws RepositoryException;
+    Product addProduct(ProductContext productContext) throws RepositoryException;
 
     Product getProduct(int id) throws RepositoryException;
 

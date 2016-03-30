@@ -6,7 +6,7 @@ public class Product {
     private int quantity;
     private int price;
 
-    public Product(int id, ProductParameters params) {
+    public Product(int id, ProductContext params) {
         this.id = id;
         this.title = params.getTitle();
         this.category = params.getCategory();

@@ -2,10 +2,9 @@ package mysite.repository.jdbc;
 
 import mysite.exception.RepositoryException;
 import mysite.models.Product;
-import mysite.models.ProductParameters;
+import mysite.models.ProductContext;
 import mysite.repository.ProductRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -28,21 +27,21 @@ public class JdbcProductRepository implements ProductRepository {
     private DataSource dataSource;
 
     @Override
-    public Product addProduct(ProductParameters productParameters) throws RepositoryException {
+    public Product addProduct(ProductContext productContext) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setString(1, productParameters.getTitle());
-                stmt.setString(2, productParameters.getCategory());
-                stmt.setString(3, productParameters.getManufacturer());
-                stmt.setString(4, productParameters.getDescription());
-                stmt.setString(5, productParameters.getImg());
-                stmt.setInt(6, productParameters.getQuantity());
-                stmt.setInt(7, productParameters.getPrice());
+                stmt.setString(1, productContext.getTitle());
+                stmt.setString(2, productContext.getCategory());
+                stmt.setString(3, productContext.getManufacturer());
+                stmt.setString(4, productContext.getDescription());
+                stmt.setString(5, productContext.getImg());
+                stmt.setInt(6, productContext.getQuantity());
+                stmt.setInt(7, productContext.getPrice());
                 stmt.executeUpdate();
                 ResultSet resultSet = stmt.getGeneratedKeys();
                 if(resultSet.next()){
                     int id = resultSet.getInt(1);
-                    return new Product(id, productParameters);
+                    return new Product(id, productContext);
                 } else {
                     throw new RepositoryException("Database cannot generate primary key value");
                 }
@@ -66,7 +65,7 @@ public class JdbcProductRepository implements ProductRepository {
                         String img = resultSet.getString(6);
                         int quantity = resultSet.getInt(7);
                         int price = resultSet.getInt(8);
-                        ProductParameters param = new ProductParameters(
+                        ProductContext param = new ProductContext(
                                 title, category, manufacturer, description, img, price, quantity
                         );
                         return new Product(id, param);
@@ -94,7 +93,7 @@ public class JdbcProductRepository implements ProductRepository {
                         String img = resultSet.getString(6);
                         int quantity = resultSet.getInt(7);
                         int price = resultSet.getInt(8);
-                        ProductParameters param = new ProductParameters(
+                        ProductContext param = new ProductContext(
                                 title, category, manufacturer, description, img, price, quantity
                         );
                         products.add(new Product(id, param));

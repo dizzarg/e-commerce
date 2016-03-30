@@ -2,7 +2,7 @@ package mysite.repository.memory;
 
 import mysite.exception.RepositoryException;
 import mysite.models.Product;
-import mysite.models.ProductParameters;
+import mysite.models.ProductContext;
 import mysite.repository.ProductRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,8 +17,8 @@ public class InMemoryProductRepository implements ProductRepository {
     private final AtomicInteger productIDGenerator = new AtomicInteger(0);
 
     @Override
-    public Product addProduct(ProductParameters productParameters) {
-        Product product = new Product(productIDGenerator.incrementAndGet(), productParameters);
+    public Product addProduct(ProductContext productContext) {
+        Product product = new Product(productIDGenerator.incrementAndGet(), productContext);
         products.put(product.getId(), product);
         return product;
     }

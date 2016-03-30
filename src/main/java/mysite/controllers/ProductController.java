@@ -1,7 +1,7 @@
 package mysite.controllers;
 
 import mysite.models.Product;
-import mysite.models.ProductParameters;
+import mysite.models.ProductContext;
 import mysite.services.ShopService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ public class ProductController {
 
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<Integer> addProduct(
-            @RequestBody ProductParameters param){
+            @RequestBody ProductContext param){
         Product product = shopService.addProduct(param);
         return ResponseEntity.ok(product.getId());
     }
@@ -40,7 +40,7 @@ public class ProductController {
 
     @RequestMapping(value = "/{productId}", method = RequestMethod.PUT)
     public void updateProduct(@PathVariable("productId") int productId,
-                              @RequestBody ProductParameters param) {
+                              @RequestBody ProductContext param) {
         shopService.updateProduct(productId, param);
     }
 
