@@ -13,50 +13,49 @@
 <body>
 <div>
     <div class="container">
-        <div class="navbar navbar-inverse" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+        <h1>Онлайн платеж</h1>
+    </div>
+    <div class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/" aria-hidden="true">Онлайн платеж</a>
+        </div>
+        <div class="collapse navbar-collapse" id="main-navbar">
+            <ul class="nav navbar-nav">
+                <li><a href="#/products" aria-hidden="true">Список</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" data-bind="with: customer">
+                <li data-bind="visible: shoppingCart().length > 0" ><a href="#/cart">Корзина<span class="badge" data-bind="text: shoppingCart().length">100</span></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i><!--ko text: username-->Пользователь<!--/ko--> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a aria-selected="false" href="#/profile">Профиль</a></li>
+                        <li><a aria-selected="false"href="#/orders">Заказы</a></li>
+                        <li class="divider"></li>
+                        <li><a aria-selected="false" href="#/logout">Выйти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <div class="form-group">
+            <div id="search" class="input-group">
+                <input type="text" class="form-control" placeholder="Введите наименование товара или услуги">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" aria-hidden="true">
+                        <i class="glyphicon glyphicon-search"></i>
                     </button>
-                    <a class="navbar-brand" href="/" aria-hidden="true">Онлайн платеж</a>
-                </div>
-                <div class="collapse navbar-collapse" id="main-navbar">
-                    <ul class="nav navbar-nav">
-                        <li><a href="#/products" aria-hidden="true">Список</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right" data-bind="with: customer">
-                        <li data-bind="visible: shoppingCart().length > 0" ><a href="#/cart">Корзина<span class="badge" data-bind="text: shoppingCart().length">100</span></a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i><!--ko text: username-->Пользователь<!--/ko--> <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a aria-selected="false" href="#/profile">Профиль</a></li>
-                                <li><a aria-selected="false"href="#/orders">Заказы</a></li>
-                                <li class="divider"></li>
-                                <li><a aria-selected="false" href="#/logout">Выйти</a></li>
-                            </ul>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>
-        <div class="container">
-            <div id="search" class="row">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Введите наименование товара или услуги">
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" aria-hidden="true">
-                            <i class="glyphicon glyphicon-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div id="content">
+        <div id="content" class="row">
 
-            </div>
         </div>
     </div>
 </div>

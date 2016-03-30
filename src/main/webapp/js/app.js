@@ -146,7 +146,7 @@
         };
         self.createPayment = function (order) {
             self.server.createPayment(order, function (data) {
-                console.log(data);
+                self.customer().shoppingCart([]);
                 window.location.hash = '/';
             });
         };
