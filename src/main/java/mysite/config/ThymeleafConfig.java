@@ -3,25 +3,30 @@ package mysite.config;
 import mysite.Application;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import java.util.List;
+import java.util.Locale;
 
 @Configuration
 @EnableWebMvc
@@ -32,6 +37,44 @@ public class ThymeleafConfig extends WebMvcConfigurerAdapter implements Applicat
 
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:messages/messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        return messageSource;
+    }
+
+//    @Bean
+//    public LocaleResolver localeResolver(){
+//        CookieLocaleResolver resolver = new CookieLocaleResolver();
+//        resolver.setDefaultLocale(new Locale("en"));
+//        resolver.setCookieName("myLocaleCookie");
+//        resolver.setCookieMaxAge(4800);
+//        return resolver;
+//    }
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.ENGLISH);
+        return slr;
+    }
+
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        return lci;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+//        LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
+//        interceptor.setParamName("mylocale");
+        registry.addInterceptor(localeChangeInterceptor() );
     }
 
     @Override
@@ -54,19 +97,32 @@ public class ThymeleafConfig extends WebMvcConfigurerAdapter implements Applicat
         registry.addResourceHandler("/js/**").addResourceLocations("/js/");
         registry.addResourceHandler("/partials/**").addResourceLocations("/partials/");
         registry.addResourceHandler("/data/**").addResourceLocations("/data/");
+        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
     }
 
+    /*
     @Bean
-    public ViewResolver viewResolver() {
+    public SpringTemplateEngine templateEngine(MessageSource messageSource, ServletContextTemplateResolver templateResolver) {
+        SpringTemplateEngine engine = new SpringTemplateEngine();
+        engine.setTemplateResolver(templateResolver);
+        engine.setMessageSource(messageSource);
+        return engine;
+    }
+     */
+
+    @Bean
+    public ViewResolver viewResolver(MessageSource messageSource) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-        resolver.setTemplateEngine(templateEngine());
+        resolver.setTemplateEngine(templateEngine(messageSource));
         resolver.setCharacterEncoding("UTF-8");
         return resolver;
     }
 
-    private TemplateEngine templateEngine() {
+    private TemplateEngine templateEngine(MessageSource messageSource) {
         SpringTemplateEngine engine = new SpringTemplateEngine();
         engine.setTemplateResolver(templateResolver());
+        engine.setMessageSource(messageSource);
+        engine.setTemplateEngineMessageSource(messageSource);
         return engine;
     }
 
