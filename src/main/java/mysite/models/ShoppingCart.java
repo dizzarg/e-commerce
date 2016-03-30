@@ -2,9 +2,9 @@ package mysite.models;
 
 import mysite.exception.ModelException;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
 
 public class ShoppingCart {
 
