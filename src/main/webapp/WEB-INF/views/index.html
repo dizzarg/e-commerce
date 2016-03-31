@@ -11,8 +11,8 @@
     <title>Сайт онлайнт платежей - My commerce site</title>
 </head>
 <body>
-<div>
-    <div class="container">
+<div class="container">
+    <div>
         <h1>Онлайн платеж</h1>
     </div>
     <div class="navbar navbar-inverse" role="navigation">
@@ -43,20 +43,18 @@
             </ul>
         </div>
     </div>
-    <div class="container">
-        <div class="form-group">
-            <div id="search" class="input-group">
-                <input type="text" class="form-control" placeholder="Введите наименование товара или услуги">
-                <div class="input-group-btn">
-                    <button class="btn btn-default" aria-hidden="true">
-                        <i class="glyphicon glyphicon-search"></i>
-                    </button>
-                </div>
+    <div class="form-group">
+        <div id="search" class="input-group">
+            <input type="text" data-bind="value: searchText, valueUpdate: 'keyup', event: {keyup: redirectToListPage}" class="form-control" placeholder="Введите наименование товара или услуги">
+            <div class="input-group-btn">
+                <button class="btn btn-default" aria-hidden="true">
+                    <i class="glyphicon glyphicon-search"></i>
+                </button>
             </div>
         </div>
-        <div id="content" class="row">
+    </div>
+    <div id="content">
 
-        </div>
     </div>
 </div>
 <script type="application/javascript" src="/webjars/jquery/2.2.1/jquery.js"

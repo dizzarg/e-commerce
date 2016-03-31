@@ -121,32 +121,42 @@
             self.createCustomer(data);
         }
     };
-
+    
     var ApplicationVM = function (serverModule) {
         var self = this;
         self.server = serverModule;
-        self.products = ko.observableArray([]);
+        self.searchText = ko.observable("");
+        self.allProducts = ko.observableArray([]);
+        self.products = ko.computed(function() {
+            var search = self.searchText().trim().toLowerCase();
+            if(search.length==0) return self.allProducts();
+            return $.grep(self.allProducts(), function(product) {
+                return product.title.toLowerCase().indexOf(search) >= 0;
+            });
+        });
         self.orders = ko.observableArray([]);
         self.currentOrder = ko.observable();
         self.customer = ko.observable();
         self.selectedProduct = ko.observable();
+        self.redirectToListPage = function () {
+            window.location.hash = "/products";
+        };
         self.addProduct = function (product) {
             self.server.addProductToCustomer(product.id, self.customer().username, function () {
                 self.customer().shoppingCart.push(product.id);
-                self.customer().updateShoppingCart(self.products());
+                self.customer().updateShoppingCart(self.allProducts());
             });
         };
         self.removeProduct = function (product) {
             self.server.removeProductFromCustomer(product.id, self.customer().username, function () {
                 self.customer().shoppingCart.remove(product.id);
-                self.customer().updateShoppingCart(self.products());
+                self.customer().updateShoppingCart(self.allProducts());
                 if(self.customer().shoppingCart().length<=0)
                     window.location.hash = "/";
             });
         };
         self.createPayment = function (order) {
             self.server.createPayment(order, function (data) {
-                self.customer().shoppingCart([]);
                 window.location.hash = '/';
             });
         };
@@ -156,7 +166,7 @@
         self.server.loadProducts(function (data) {
             for (var i=0; i<data.length; i++){
                 var product = new Product(data[i]);
-                self.products.push(product);
+                self.allProducts.push(product);
             }
         });
 
@@ -222,6 +232,7 @@
         self.appvm = new ApplicationVM(self.server);
         var routes = {
             '/': function () {
+                self.appvm.searchText('');
                 $('#content').load('/products/list', function () {
                     ko.applyBindings(self.appvm, document.getElementById("products"));
                 });
@@ -232,6 +243,7 @@
                 });
             },
             '/product/:id': function (id) {
+                self.appvm.searchText('');
                 $('#content').load('/products/product', function () {
                     var prod = ko.utils.arrayFirst(self.appvm.products(), function (item) {
                         return item.id == id;
@@ -242,12 +254,14 @@
                 });
             },
             '/cart': function () {
+                self.appvm.searchText('');
                 $('#content').load('/products/shoppingCart', function () {
                     self.appvm.customer().updateShoppingCart(self.appvm.products());
                     ko.applyBindings(self.appvm, document.getElementById("cart"));
                 });
             },
             '/orders': function () {
+                self.appvm.searchText('');
                 $('#content').load('/orders/load', function () {
                     self.server.loadOrders(self.appvm.customer().username, function (data) {
                         self.appvm.orders.removeAll();
@@ -259,7 +273,9 @@
                 });
             },
             '/orders/create': function () {
+                self.appvm.searchText('');
                 self.server.createOrder(self.appvm.customer().username, function (data) {
+                    self.appvm.customer().shoppingCart.removeAll();
                     $('#content').load('/orders/order', function () {
                         self.appvm.currentOrder(new Order(data, self.appvm.products()));
                         ko.applyBindings(self.appvm, document.getElementById("order"));
