@@ -156,7 +156,7 @@
             });
         };
         self.createPayment = function (order) {
-            self.server.createPayment(order, function (data) {
+            self.server.createPayment(order, 1,  function (data) {
                 window.location.hash = '/';
             });
         };
@@ -217,8 +217,8 @@
             });
         };
         
-        self.createPayment = function (order, callback) {
-            $.post('/api/payments', {orderId: order.id}, function (data) {
+        self.createPayment = function (order, amount, callback) {
+            $.post('/api/payments', {orderId: order.id, amount:amount}, function (data) {
                 if(callback){
                     callback(data)
                 }

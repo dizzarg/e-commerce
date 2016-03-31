@@ -9,8 +9,9 @@ public class PaymentController extends ApiController {
 
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
-    Payment createOrder(@RequestParam("orderId") Integer orderId) {
-        return shopService.createPayment(orderId);
+    Payment createOrder(@RequestParam("orderId") Integer orderId,
+                        @RequestParam("amount") Integer amount) {
+        return shopService.createPayment(orderId, amount);
     }
 
 }

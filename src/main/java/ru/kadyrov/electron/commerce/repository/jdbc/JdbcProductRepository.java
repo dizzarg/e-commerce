@@ -42,9 +42,8 @@ public class JdbcProductRepository implements ProductRepository {
                 if(resultSet.next()){
                     int id = resultSet.getInt(1);
                     return new Product(id, productContext);
-                } else {
-                    throw new RepositoryException("Database cannot generate primary key value");
                 }
+                throw new RepositoryException("Database cannot generate primary key value");
             }
         } catch (SQLException e) {
             throw new RepositoryException("Cannot create product",e);

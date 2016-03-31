@@ -8,7 +8,7 @@ public class Payment {
 
     private Integer id;
     private Order order;
-    private Long amount;
+    private Integer amount;
     private Status status;
     private String expiration;
     private String number;
@@ -76,11 +76,11 @@ public class Payment {
         this.status = status;
     }
 
-    public Long getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 

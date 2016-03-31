@@ -133,15 +133,27 @@ public class ShopService {
         }
     }
 
-    public Payment createPayment(Integer orderId){
+    public Payment createPayment(Integer orderId, Integer amount){
         try{
             Order order = orderRepository.getOrder(orderId);
             order.shipIt();
             orderRepository.updateOrder(order);
-            return paymentRepository.addPayment(new PaymentContext(order));
+            Payment payment = new Payment();
+            payment.setOrder(order);
+            payment.setAmount(amount);
+            return paymentRepository.addPayment(payment);
         } catch (RepositoryException ex){
             logger.error("Cannot create payment", ex);
             throw new ShopServiceException("Cannot create payment", ex);
+        }
+    }
+
+    public List<Payment> getPayments(){
+        try {
+            return paymentRepository.getPayments();
+        } catch (RepositoryException ex) {
+            logger.error("Cannot load payments", ex);
+            throw new ShopServiceException("Cannot load payments", ex);
         }
     }
 
