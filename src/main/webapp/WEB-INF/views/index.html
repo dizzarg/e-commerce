@@ -28,8 +28,8 @@
         <div class="collapse navbar-collapse" id="main-navbar">
             <ul class="nav navbar-nav">
                 <li><a href="#/products" aria-hidden="true">Список</a></li>
-                <li><a aria-selected="false" href="#/orders">Заказы</a></li>
-                <li><a aria-selected="false" href="#/payments">Платежи</a></li>
+                <li><a aria-selected="false" href="#/orders" th:utext="#{electron.commerce.orders.label}">Заказы</a></li>
+                <li><a aria-selected="false" href="#/payments" th:utext="#{electron.commerce.payments.label}">Платежи</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" data-bind="with: customer">
                 <li data-bind="visible: shoppingCart().length > 0" ><a href="#/cart">Корзина<span class="badge" data-bind="text: shoppingCart().length">100</span></a></li>
