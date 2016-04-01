@@ -87,7 +87,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.6</version>
         </dependency>
-        <!-- static content -->
+        <!-- Static content -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
