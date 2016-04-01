@@ -1,10 +1,10 @@
 package ru.kadyrov.electron.commerce.controllers;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.kadyrov.electron.commerce.models.Product;
 import ru.kadyrov.electron.commerce.models.ProductContext;
 import ru.kadyrov.electron.commerce.services.ShopService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.List;

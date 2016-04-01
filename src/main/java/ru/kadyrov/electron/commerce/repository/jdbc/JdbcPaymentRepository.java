@@ -16,7 +16,7 @@ import java.util.List;
 public class JdbcPaymentRepository implements PaymentRepository {
 
     private static final String FIND_ALL = "SELECT id, order_id, amount, create_dt FROM payments";
-    private static final String INSERT = "INSERT INTO payments (order_id, amount, card_num, cart_exp) VALUES (?,?,?,?);";
+    private static final String INSERT = "INSERT INTO payments (order_id, amount) VALUES (?,?);";
 
     @Inject
     private DataSource dataSource;
@@ -27,8 +27,6 @@ public class JdbcPaymentRepository implements PaymentRepository {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setInt(1, payment.getOrder().getId());
                 stmt.setInt(2, payment.getAmount());
-                stmt.setString(3, "");
-                stmt.setString(4, "");
                 stmt.executeUpdate();
                 ResultSet resultSet = stmt.getGeneratedKeys();
                 if(resultSet.next()){
@@ -52,6 +50,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
                 try (ResultSet resultSet = stmt.executeQuery(FIND_ALL)) {
                     while (resultSet.next()){
                         int id = resultSet.getInt(1);
+                        int orderId = resultSet.getInt(2);
                         int amount = resultSet.getInt(3);
                         Payment payment = new Payment();
                         payment.setId(id);

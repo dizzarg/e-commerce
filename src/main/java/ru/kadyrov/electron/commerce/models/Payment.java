@@ -10,9 +10,7 @@ public class Payment {
     private Order order;
     private Integer amount;
     private Status status;
-    private String expiration;
-    private String number;
-    private String cvv;
+    private AccountTransaction transaction;
 
     /**
      * <ul>
@@ -84,39 +82,12 @@ public class Payment {
         this.amount = amount;
     }
 
-    public String getExpiration() {
-        return expiration;
-    }
-
-    public void setExpiration(String expiration) {
-        this.expiration = expiration;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getCvv() {
-        return cvv;
-    }
-
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
-    }
-
     @Override
     public String toString() {
         return "Payment{" +
                 "id=" + id +
                 ", order=" + order +
                 ", amount=" + amount +
-                ", expiration='" + expiration + '\'' +
-                ", number='" + number + '\'' +
-                ", cvv='" + cvv + '\'' +
                 '}';
     }
 
@@ -127,14 +98,11 @@ public class Payment {
         Payment payment = (Payment) o;
         return Objects.equals(id, payment.id) &&
                 Objects.equals(order, payment.order) &&
-                Objects.equals(amount, payment.amount) &&
-                Objects.equals(expiration, payment.expiration) &&
-                Objects.equals(number, payment.number) &&
-                Objects.equals(cvv, payment.cvv);
+                Objects.equals(amount, payment.amount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, order, amount, expiration, number, cvv);
+        return Objects.hash(id, order, amount);
     }
 }

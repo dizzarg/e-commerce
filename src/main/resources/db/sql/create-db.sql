@@ -30,7 +30,5 @@ CREATE TABLE payments (
   order_id VARCHAR(30) NOT NULL,
   amount INTEGER NOT NULL,
   create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
-  card_num VARCHAR(30) NOT NULL,
-  cart_exp VARCHAR(10) NOT NULL,
   foreign key (order_id) references orders(id)
 )

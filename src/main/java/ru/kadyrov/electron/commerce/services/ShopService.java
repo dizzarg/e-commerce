@@ -133,15 +133,20 @@ public class ShopService {
         }
     }
 
-    public Payment createPayment(Integer orderId, Integer amount){
+    public Payment createPayment(Integer orderId){
         try{
             Order order = orderRepository.getOrder(orderId);
-            order.shipIt();
-            orderRepository.updateOrder(order);
+            Integer sum = 0;
+            for (Integer productId : order.getProductIds()){
+                Product product = productRepository.getProduct(productId);
+                sum+= product.getPrice();
+            }
             Payment payment = new Payment();
             payment.setOrder(order);
-            payment.setAmount(amount);
-            return paymentRepository.addPayment(payment);
+            payment.setAmount(sum);
+            Payment payment1 = paymentRepository.addPayment(payment);
+            logger.info("Payments was created");
+            return payment1;
         } catch (RepositoryException ex){
             logger.error("Cannot create payment", ex);
             throw new ShopServiceException("Cannot create payment", ex);
@@ -150,7 +155,9 @@ public class ShopService {
 
     public List<Payment> getPayments(){
         try {
-            return paymentRepository.getPayments();
+            List<Payment> payments = paymentRepository.getPayments();
+            logger.info("Payments was loaded");
+            return payments;
         } catch (RepositoryException ex) {
             logger.error("Cannot load payments", ex);
             throw new ShopServiceException("Cannot load payments", ex);

@@ -28,6 +28,8 @@
         <div class="collapse navbar-collapse" id="main-navbar">
             <ul class="nav navbar-nav">
                 <li><a href="#/products" aria-hidden="true">Список</a></li>
+                <li><a aria-selected="false" href="#/orders">Заказы</a></li>
+                <li><a aria-selected="false" href="#/payments">Платежи</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" data-bind="with: customer">
                 <li data-bind="visible: shoppingCart().length > 0" ><a href="#/cart">Корзина<span class="badge" data-bind="text: shoppingCart().length">100</span></a></li>
@@ -35,7 +37,6 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i><!--ko text: username-->Пользователь<!--/ko--> <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a aria-selected="false" href="#/profile">Профиль</a></li>
-                        <li><a aria-selected="false"href="#/orders">Заказы</a></li>
                         <li class="divider"></li>
                         <li><a aria-selected="false" href="#/logout">Выйти</a></li>
                     </ul>

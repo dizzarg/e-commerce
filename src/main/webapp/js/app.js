@@ -43,6 +43,21 @@
         }
     };
 
+    var Payment = function (data) {
+        var self = this;
+        self.orders = [];
+        self.createPayment = function (data) {
+            if(data.id)
+                self.id = data.id;
+            if(data.amount)
+                self.amount = formatter.format(data.amount/100);
+        };
+
+        if(data){
+            self.createPayment(data);
+        }
+    };
+    
     var Product = function (data) {
         var self = this;
         self.createProduct = function (data) {
@@ -136,6 +151,7 @@
         });
         self.orders = ko.observableArray([]);
         self.currentOrder = ko.observable();
+        self.payments = ko.observableArray([]);
         self.customer = ko.observable();
         self.selectedProduct = ko.observable();
         self.redirectToListPage = function () {
@@ -195,6 +211,13 @@
                 }
             });
         };
+        self.loadPayments = function (callback) {
+            $.getJSON('/api/payments', function (data) {
+                if(callback){
+                    callback(data)
+                }
+            });
+        };
         self.addProductToCustomer = function (id, userName, callback) {
             $.post('/api/shop/add',{productId: id, userName: userName, amount: 1}, function () {
                 if(callback){
@@ -248,7 +271,6 @@
                     var prod = ko.utils.arrayFirst(self.appvm.products(), function (item) {
                         return item.id == id;
                     });
-                    
                     self.appvm.selectedProduct(prod);
                     ko.applyBindings(self.appvm, document.getElementById("product"));
                 });
@@ -281,7 +303,19 @@
                         ko.applyBindings(self.appvm, document.getElementById("order"));
                     });    
                 });
-            }
+            },
+            '/payments': function () {
+                self.appvm.searchText('');
+                $('#content').load('/payments/load', function () {
+                    self.server.loadPayments(function (data) {
+                        self.appvm.payments.removeAll();
+                        for (var i =0 ;i<data.length; i++) {
+                            self.appvm.payments.push(new Payment(data[i]))
+                        }
+                        ko.applyBindings(self.appvm, document.getElementById("payments"));
+                    });
+                });
+            },
         };
         ko.applyBindings(self.appvm);
         var router = Router(routes);
