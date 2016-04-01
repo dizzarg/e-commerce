@@ -8,12 +8,12 @@
     <link rel="stylesheet" type="text/css" media="all"
           href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
           th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
-    <title>Сайт онлайнт платежей - My commerce site</title>
+    <title th:utext="#{electron.commerce.title}">My electron commerce site</title>
 </head>
 <body>
 <div class="container">
     <div>
-        <h1>Онлайн платеж</h1>
+        <h1 th:utext="#{electron.commerce.title}">Онлайн платеж</h1>
     </div>
     <div class="navbar navbar-inverse" role="navigation">
         <div class="navbar-header">
@@ -23,7 +23,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/" aria-hidden="true">Онлайн платеж</a>
+            <a class="navbar-brand" href="/" aria-hidden="true" th:utext="#{electron.commerce.title}">Онлайн платеж</a>
         </div>
         <div class="collapse navbar-collapse" id="main-navbar">
             <ul class="nav navbar-nav">
