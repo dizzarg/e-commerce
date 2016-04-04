@@ -38,13 +38,16 @@ public class ThymeleafConfig extends WebMvcConfigurerAdapter implements Applicat
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index");
-        registry.addViewController("/products/list").setViewName("fragments :: listProduct");
-        registry.addViewController("/products/add").setViewName("fragments :: addProduct");
-        registry.addViewController("/products/product").setViewName("fragments :: product");
-        registry.addViewController("/products/shoppingCart").setViewName("fragments :: shoppingCart");
-        registry.addViewController("/orders/load").setViewName("fragments :: orders");
-        registry.addViewController("/orders/order").setViewName("fragments :: order");
-        registry.addViewController("/payments/load").setViewName("fragments :: payments");
+        registry.addViewController("/products/list").setViewName("fragments/products :: list");
+        registry.addViewController("/products/add").setViewName("fragments/products :: addProduct");
+        registry.addViewController("/products/one").setViewName("fragments/products :: one");
+
+        registry.addViewController("/orders/list").setViewName("fragments/orders :: list");
+        registry.addViewController("/orders/one").setViewName("fragments/orders :: one");
+
+        registry.addViewController("/payments/list").setViewName("fragments/payments :: list");
+
+        registry.addViewController("/customer/cart").setViewName("fragments/customer :: cart");
         super.addViewControllers(registry);
     }
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
+          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+</head>
+
+<body>
+<div th:fragment="list">
+    <div id="orders">
+        <h3 th:utext="#{electron.commerce.orders.header.label}">My orders</h3>
+        <div data-bind="foreach: orders()">
+            <div class="panel panel-default">
+                <div class="panel-heading" data-bind="text: 'Order #'+id+' was created '+dateCreated"
+                     th:attr="data-bind = 'text: \'' +#{electron.commerce.order.description.label('\'+id+\'','\'+dateCreated')}">
+                    Panel heading without title
+                </div>
+                <div class="panel-body">
+                    <h4 th:utext="#{electron.commerce.order.content.label}">Content</h4>
+                    <ul class="list-group" data-bind="foreach: products">
+                        <li class="list-group-item" data-bind="text: title">
+                            <span class="badge">1</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:fragment="one">
+    <div id="order">
+        <h3 th:utext="#{electron.commerce.order.header.label}">My order</h3>
+        <div class="panel panel-default" data-bind="with: currentOrder">
+            <div class="panel-heading" data-bind="text: 'Order #'+id+' was created '+dateCreated"
+                 th:attr="data-bind = 'text: \'' +#{electron.commerce.order.description.label('\'+id+\'','\'+dateCreated')}">title</div>
+            <div class="panel-body">
+                <h4 th:utext="#{electron.commerce.order.content.label}">Content</h4>
+                <ul class="list-group" data-bind="foreach: products">
+                    <li class="list-group-item" data-bind="text: title">
+                        <span class="badge">1</span>
+                    </li>
+                </ul>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h4 th:utext="#{electron.commerce.payment.deatil.label}">Payment detail</h4>
+                        <input class="form-control" type="text" value="4111 1111 1111 1111"/>
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label for="expDate" th:utext="#{electron.commerce.payment.deatil.expdate.label}">Expiration date</label>
+                                <input type="text" class="form-control" id="expDate" name="expDate" placeholder="03/2020">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvvcvc">CVV/CVC</label>
+                                <input type="password" class="form-control" id="cvvcvc" name="cvvcvc" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" data-bind="click: $root.createPayment" class="btn btn-primary" th:utext="#{electron.commerce.payment.payaction.label}">Pay</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

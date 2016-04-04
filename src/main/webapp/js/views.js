@@ -129,7 +129,7 @@ var ApplicationModule = function () {
         },
         '/product/:id': function (id) {
             self.appvm.searchText('');
-            $('#content').load('/products/product', function () {
+            $('#content').load('/products/one', function () {
                 var prod = ko.utils.arrayFirst(self.appvm.products(), function (item) {
                     return item.id == id;
                 });
@@ -139,14 +139,14 @@ var ApplicationModule = function () {
         },
         '/cart': function () {
             self.appvm.searchText('');
-            $('#content').load('/products/shoppingCart', function () {
+            $('#content').load('/customer/cart', function () {
                 self.appvm.customer().updateShoppingCart(self.appvm.products());
                 ko.applyBindings(self.appvm, document.getElementById("cart"));
             });
         },
         '/orders': function () {
             self.appvm.searchText('');
-            $('#content').load('/orders/load', function () {
+            $('#content').load('/orders/list', function () {
                 self.server.loadOrders(self.appvm.customer().username, function (data) {
                     self.appvm.orders.removeAll();
                     for (var i =0 ;i<data.length; i++) {
@@ -160,7 +160,7 @@ var ApplicationModule = function () {
             self.appvm.searchText('');
             self.server.createOrder(self.appvm.customer().username, function (data) {
                 self.appvm.customer().shoppingCart.removeAll();
-                $('#content').load('/orders/order', function () {
+                $('#content').load('/orders/one', function () {
                     self.appvm.currentOrder(new Order(data, self.appvm.products()));
                     ko.applyBindings(self.appvm, document.getElementById("order"));
                 });
@@ -168,7 +168,7 @@ var ApplicationModule = function () {
         },
         '/payments': function () {
             self.appvm.searchText('');
-            $('#content').load('/payments/load', function () {
+            $('#content').load('/payments/list', function () {
                 self.server.loadPayments(function (data) {
                     self.appvm.payments.removeAll();
                     for (var i =0 ;i<data.length; i++) {

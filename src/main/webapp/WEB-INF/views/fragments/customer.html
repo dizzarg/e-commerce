@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
+          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+</head>
+
+<body>
+<div th:fragment="cart">
+    <div id="cart" data-bind="with: customer">
+        <h3 th:utext="#{electron.commerce.cart.header.label}">Payments cart</h3>
+        <p data-bind="visible: products().length>0" th:utext="#{electron.commerce.cart.description.text}"></p>
+        <p data-bind="visible: products().length<=0" th:utext="#{electron.commerce.cart.empty.description.text}"></p>
+        <div data-bind="foreach: products">
+            <div class="media">
+                <div class="pull-left">
+                    <img class="media-object" data-bind="attr: { 'src': 'http://placehold.it/120x120?text='+title, 'alt': title }">
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading" data-bind="text: title">Title</h4>
+                    <p data-bind="text: fullDescription">...</p>
+                    <p><b th:utext="#{electron.commerce.product.price.label}">Price</b><i data-bind="text: price"></i></p>
+                </div>
+                <div class="pull-right">
+                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary" th:utext="#{electron.commerce.cart.remove.label}">Remove</button>
+                </div>
+            </div>
+        </div>
+        <div class="media" data-bind="visible: products().length>0">
+            <div class="media-body">
+                <h4 class="media-heading">
+                    <i th:utext="#{electron.commerce.cart.total.label}" th:remove="tag">Total</i>
+                    <span data-bind="text: totalPrice">0</span>
+                </h4>
+            </div>
+            <div class="pull-right">
+                <a href="#/orders/create" class="btn btn-primary" th:utext="#{electron.commerce.order.create.label}">New order</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
