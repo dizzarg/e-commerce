@@ -74,7 +74,7 @@ public class ThymeleafConfig extends WebMvcConfigurerAdapter implements Applicat
     public LocaleResolver localeResolver() {
         return new CookieLocaleResolver() {
             {
-                setDefaultLocale(Locale.forLanguageTag("ru"));
+                setDefaultLocale(Locale.getDefault());
             }
         };
     }

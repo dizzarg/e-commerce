@@ -8,12 +8,12 @@
     <link rel="stylesheet" type="text/css" media="all"
           href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
           th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
-    <title th:utext="#{electron.commerce.title}">My electron commerce site</title>
+    <title th:utext="#{electron.commerce.title}">Site title</title>
 </head>
 <body>
 <div class="container">
     <div>
-        <h1 th:utext="#{electron.commerce.title}">Онлайн платеж</h1>
+        <h1 th:utext="#{electron.commerce.title}">Site title</h1>
     </div>
     <div class="navbar navbar-inverse" role="navigation">
         <div class="navbar-header">
@@ -23,30 +23,19 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/" aria-hidden="true" th:utext="#{electron.commerce.title}">Онлайн платеж</a>
+            <a class="navbar-brand" href="/" aria-hidden="true" th:utext="#{electron.commerce.title}">Site title</a>
         </div>
         <div class="collapse navbar-collapse" id="main-navbar">
             <ul class="nav navbar-nav">
-                <li><a href="#/products" aria-hidden="true">Список</a></li>
-                <li><a aria-selected="false" href="#/orders" th:utext="#{electron.commerce.orders.label}">Заказы</a></li>
-                <li><a aria-selected="false" href="#/payments" th:utext="#{electron.commerce.payments.label}">Платежи</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right" data-bind="with: customer">
-                <li data-bind="visible: shoppingCart().length > 0" ><a href="#/cart">Корзина<span class="badge" data-bind="text: shoppingCart().length">100</span></a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i><!--ko text: username-->Пользователь<!--/ko--> <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a aria-selected="false" href="#/profile">Профиль</a></li>
-                        <li class="divider"></li>
-                        <li><a aria-selected="false" href="#/logout">Выйти</a></li>
-                    </ul>
-                </li>
+                <li><a aria-selected="false" href="#/cart" th:utext="#{electron.commerce.cart.label}">Cart</a></li>
+                <li><a aria-selected="false" href="#/orders" th:utext="#{electron.commerce.orders.label}">Orders</a></li>
+                <li><a aria-selected="false" href="#/payments" th:utext="#{electron.commerce.payments.label}">Payments</a></li>
             </ul>
         </div>
     </div>
     <div class="form-group">
         <div id="search" class="input-group">
-            <input type="text" data-bind="value: searchText, valueUpdate: 'keyup', event: {keyup: redirectToListPage}" class="form-control" placeholder="Введите наименование товара или услуги">
+            <input type="text" data-bind="value: searchText, valueUpdate: 'keyup', event: {keyup: redirectToListPage}" class="form-control" th:placeholder="#{electron.commerce.search.placeholder}" placeholder="Input product name">
             <div class="input-group-btn">
                 <button class="btn btn-default" aria-hidden="true">
                     <i class="glyphicon glyphicon-search"></i>

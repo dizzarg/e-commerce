@@ -6,6 +6,7 @@
 </head>
 
 <body>
+<!-- TODO: create admin module and add it there -->
 <div th:fragment="addProduct">
     <form role="form" class="form-horizontal">
         <div class="form-group text-right" th:each="x : ${#strings.arraySplit('title,category,manufacturer,description,price,quantity',',')}">
@@ -14,7 +15,7 @@
                 <input type="text" class="form-control" th:id="${x}" th:name="${x}" th:placeholder="${#strings.capitalize(x)}" id="title" name="title" placeholder="Title">
             </div>
         </div>
-        <button type="submit" class="btn btn-default">Отправить</button>
+        <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </div>
 <div th:fragment="listProduct">
@@ -23,14 +24,14 @@
             <div class="thumbnail">
                 <img data-bind="attr: { 'src': 'http://placehold.it/300x200?text='+title, 'alt': title }"/>
                 <div class="caption">
-                    <h3 data-bind="text: title">Ярлык эскиза</h3>
+                    <h3 data-bind="text: title">Title</h3>
                     <p data-bind="text: shortDescription">...</p>
                     <p data-bind="text: 'Стоимость: '+price">...</p>
                     <p>
-                        <a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default" role="button">Подробнее</a>
+                        <a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default" role="button" th:utext="#{electron.commerce.product.more.label}">More</a>
                         <a data-bind="click: $parent.addProduct" class="btn btn-primary" role="button">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                            Добавить в корзину
+                            <i th:text="#{electron.commerce.cart.add.label}" th:remove="tag">Add to Cart</i>
                         </a>
                     </p>
                 </div>
@@ -42,14 +43,14 @@
     <div id="product" data-bind="with: selectedProduct()">
         <div class="thumbnail">
             <div class="caption">
-                <h3 data-bind="text: title">Ярлык эскиза</h3>
+                <h3 data-bind="text: title">Title</h3>
                 <img data-bind="attr: { 'src': 'http://placehold.it/300x200?text='+title, 'alt': title }"/>
                 <p data-bind="text: fullDescription">...</p>
                 <p data-bind="text: 'Стоимость: '+price">...</p>
                 <p>
                     <a data-bind="click: $parent.addProduct" class="btn btn-primary" role="button">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        Добавить в корзину
+                        <i th:text="#{electron.commerce.cart.add.label}" th:remove="tag">Add to Cart</i>
                     </a>
                 </p>
             </div>
@@ -57,10 +58,8 @@
     </div>
 </div>
 <div th:fragment="shoppingCart">
-    <h3>Корзина платежей</h3>
-    <p>
-        Корзина позволяет оплатить несколько услуг, вводя данные банковской карты один раз. Для оплаты добавленных платежей, отметьте их галочкой. После этого переходите к оплате, нажав на кнопку «Оплатить».
-    </p>
+    <h3 th:utext="#{electron.commerce.cart.header.label}">Payments cart</h3>
+    <p th:utext="#{electron.commerce.cart.description.text}"></p>
     <div id="cart" data-bind="with: customer">
         <div data-bind="foreach: products">
             <div class="media">
@@ -68,35 +67,39 @@
                     <img class="media-object" data-bind="attr: { 'src': 'http://placehold.it/64x64?text='+title, 'alt': title }">
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading" data-bind="text: title">Заголовок медиа</h4>
+                    <h4 class="media-heading" data-bind="text: title">Title</h4>
                     <p data-bind="text: fullDescription">...</p>
-                    <p data-bind="text: 'Стоимость: '+price"></p>
+                    <p><b th:utext="#{electron.commerce.product.price.label}">Price</b><i data-bind="text: price"></i></p>
                 </div>
                 <div class="pull-right">
-                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary">Удалить</button>
+                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary" th:utext="#{electron.commerce.cart.remove.label}">Удалить</button>
                 </div>
             </div>
         </div>
         <div class="media">
             <div class="media-body">
                 <h4 class="media-heading">
-                     Итого: <span data-bind="text: totalPrice">0</span>
+                    <i th:utext="#{electron.commerce.cart.total.label}" th:remove="tag">Total</i>
+                    <span data-bind="text: totalPrice">0</span>
                 </h4>
             </div>
             <div class="pull-right">
-                <a href="#/orders/create" class="btn btn-primary">Сделать заказ</a>
+                <a href="#/orders/create" class="btn btn-primary" th:utext="#{electron.commerce.order.create.label}">New order</a>
             </div>
         </div>
     </div>
 </div>
 <div th:fragment="orders">
     <div id="orders">
-        <h3>Мои заказы</h3>
-        <div data-bind="foreach: orders">
+        <h3 th:utext="#{electron.commerce.orders.header.label}">My orders</h3>
+        <div data-bind="foreach: orders()">
             <div class="panel panel-default">
-                <div class="panel-heading" data-bind="text: 'Заказ #'+id+' был создан в(о) +'+dateCreated">Panel heading without title</div>
+                <div class="panel-heading" data-bind="text: 'Order #'+id+' was created '+dateCreated"
+                  th:attr="data-bind = 'text: \'' +#{electron.commerce.order.description.label('\'+id+\'','\'+dateCreated')}">
+                    Panel heading without title
+                </div>
                 <div class="panel-body">
-                    <h4>Содержимое заказа</h4>
+                    <h4 th:utext="#{electron.commerce.order.content.label}">Content</h4>
                     <ul class="list-group" data-bind="foreach: products">
                         <li class="list-group-item" data-bind="text: title">
                             <span class="badge">1</span>
@@ -109,7 +112,7 @@
 </div>
 <div th:fragment="payments">
     <div id="payments">
-        <h3 th:utext="#{electron.commerce.payments.label}">Платежи</h3>
+        <h3 th:utext="#{electron.commerce.payments.label}">Payments</h3>
         <table class="table table-striped">
             <tr>
                 <th>#</th>
@@ -124,11 +127,12 @@
 </div>
 <div th:fragment="order">
     <div id="order">
-        <h3>Мой заказ</h3>
+        <h3 th:utext="#{electron.commerce.order.header.label}">My order</h3>
         <div class="panel panel-default" data-bind="with: currentOrder">
-            <div class="panel-heading" data-bind="text: 'Заказ #'+id+' был создан в(о) '+dateCreated">title</div>
+            <div class="panel-heading" data-bind="text: 'Order #'+id+' was created '+dateCreated"
+                 th:attr="data-bind = 'text: \'' +#{electron.commerce.order.description.label('\'+id+\'','\'+dateCreated')}">title</div>
             <div class="panel-body">
-                <h4>Содержимое заказа</h4>
+                <h4 th:utext="#{electron.commerce.order.content.label}">Content</h4>
                 <ul class="list-group" data-bind="foreach: products">
                     <li class="list-group-item" data-bind="text: title">
                         <span class="badge">1</span>
@@ -136,11 +140,11 @@
                 </ul>
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <h4>Детали платежа</h4>
+                        <h4 th:utext="#{electron.commerce.payment.deatil.label}">Payment detail</h4>
                         <input class="form-control" type="text" value="4111 1111 1111 1111"/>
                         <div class="form-inline">
                             <div class="form-group">
-                                <label for="expDate">Дата</label>
+                                <label for="expDate" th:utext="#{electron.commerce.payment.deatil.expdate.label}">Expiration date</label>
                                 <input type="text" class="form-control" id="expDate" name="expDate" placeholder="03/2020">
                             </div>
                             <div class="form-group">
@@ -150,7 +154,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" data-bind="click: $root.createPayment" class="btn btn-primary">Оплатить</button>
+                <button type="button" data-bind="click: $root.createPayment" class="btn btn-primary" th:utext="#{electron.commerce.payment.payaction.label}">Pay</button>
             </div>
         </div>
     </div>
