@@ -59,12 +59,12 @@
 </div>
 <div th:fragment="shoppingCart">
     <h3 th:utext="#{electron.commerce.cart.header.label}">Payments cart</h3>
-    <p th:utext="#{electron.commerce.cart.description.text}"></p>
+    <p th:utext="#{electron.commerce.cart.description.text(electron.commerce.order.create.label)}"></p>
     <div id="cart" data-bind="with: customer">
         <div data-bind="foreach: products">
             <div class="media">
                 <div class="pull-left">
-                    <img class="media-object" data-bind="attr: { 'src': 'http://placehold.it/64x64?text='+title, 'alt': title }">
+                    <img class="media-object" data-bind="attr: { 'src': 'http://placehold.it/120x120?text='+title, 'alt': title }">
                 </div>
                 <div class="media-body">
                     <h4 class="media-heading" data-bind="text: title">Title</h4>
@@ -72,11 +72,11 @@
                     <p><b th:utext="#{electron.commerce.product.price.label}">Price</b><i data-bind="text: price"></i></p>
                 </div>
                 <div class="pull-right">
-                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary" th:utext="#{electron.commerce.cart.remove.label}">Удалить</button>
+                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary" th:utext="#{electron.commerce.cart.remove.label}">Remove</button>
                 </div>
             </div>
         </div>
-        <div class="media">
+        <div class="media" data-bind="visible: products().length>0">
             <div class="media-body">
                 <h4 class="media-heading">
                     <i th:utext="#{electron.commerce.cart.total.label}" th:remove="tag">Total</i>
