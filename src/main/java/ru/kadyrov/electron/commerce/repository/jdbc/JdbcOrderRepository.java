@@ -1,8 +1,6 @@
 package ru.kadyrov.electron.commerce.repository.jdbc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.models.Customer;
 import ru.kadyrov.electron.commerce.models.Order;
@@ -11,17 +9,20 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
 @Repository
+@Transactional
 public class JdbcOrderRepository implements OrderRepository {
 
-    private static final String INSERT = "INSERT INTO orders (customerUsername, dateCreated, products) VALUES (?,?,?);";
-    private static final String FIND_BY_ID = "SELECT customerUsername, dateCreated, dateShipped, products FROM orders where id=?;";
-    private static final String FIND_BY_USER_NAME = "SELECT id, dateCreated, dateShipped, products FROM orders where customerUsername=?;";
+    private static final String INSERT = "INSERT INTO orders (customerUsername, dateCreated) VALUES (?,?);";
+    private static final String INSERT_ITEM = "INSERT INTO order_items (order_id, product_id) VALUES (?,?);";
+    private static final String FIND_BY_ID = "SELECT customerUsername, dateCreated, dateShipped FROM orders where id=?;";
+    private static final String FIND_ITEM_BY_ORDER_ID = "SELECT product_id FROM order_items where order_id=?;";
+    private static final String FIND_BY_USER_NAME = "SELECT id, dateCreated, dateShipped FROM orders where customerUsername=?;";
+    private static final String FIND_ITEM_BY_USER_NAME = "SELECT order_id, product_id FROM order_items where order_id in(SELECT id FROM orders where customerUsername=?);";
     private static final String DELETE_BY_ID = "DELETE FROM orders where id=?;";
     private static final String UPDATE_BY_ID = "UPDATE orders SET customerUsername = ?, dateCreated = ?, dateShipped = ? where id=?;";
 
@@ -29,23 +30,23 @@ public class JdbcOrderRepository implements OrderRepository {
     private DataSource dataSource;
 
     @Override
+    // TODO: uses Session Shopping cart value
     public Order addOrder(Customer customer) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, customer.getUsername());
                 stmt.setTimestamp(2,  new Timestamp(System.currentTimeMillis()));
-                ObjectMapper mapper = new ObjectMapper();
-                String products = null;
-                try {
-                    products = mapper.writeValueAsString(customer.getShoppingCart().getProductIds());
-                } catch (JsonProcessingException e) {
-                    products="[]";
-                }
-                stmt.setString(3, products);
                 stmt.executeUpdate();
                 ResultSet resultSet = stmt.getGeneratedKeys();
                 if(resultSet.next()){
                     int id = resultSet.getInt(1);
+                    for (Integer productId: customer.getShoppingCart().getProductIds()) {
+                        try (PreparedStatement itemStmt = conn.prepareCall(INSERT_ITEM)) {
+                            itemStmt.setInt(1, id);
+                            itemStmt.setInt(2, productId);
+                            itemStmt.executeUpdate();
+                        }
+                    }
                     return new Order(id, customer.getUsername(), customer.getShoppingCart().getProductIds());
                 } else {
                     throw new RepositoryException("Database cannot generate primary key value");
@@ -56,35 +57,19 @@ public class JdbcOrderRepository implements OrderRepository {
         }
     }
 
-//    @Override
-    public void addOrder(Order order) throws RepositoryException {
-        try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(INSERT)) {
-                stmt.setString(1, order.getUsername());
-                stmt.setTimestamp(2, new Timestamp(order.getDateCreated().getTime()));
-                if(order.isShipped()){
-                    stmt.setTimestamp(3, new Timestamp(order.getDateShipped().getTime()));
-                } else {
-                    stmt.setNull(3, Types.TIMESTAMP);
-                }
-                ObjectMapper mapper = new ObjectMapper();
-                String s = null;
-                try {
-                    s = mapper.writeValueAsString(order.getProductIds());
-                } catch (JsonProcessingException e) {
-                    s="[]";
-                }
-                stmt.setString(4, s);
-                stmt.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new RepositoryException("Cannot create order",e);
-        }
-    }
-
     @Override
     public Order getOrder(int id) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
+            ArrayList<Integer> shoppingCartProductIds = new ArrayList<>();
+            try (PreparedStatement stmt = conn.prepareStatement(FIND_ITEM_BY_ORDER_ID)) {
+                stmt.setInt(1, id);
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    while (resultSet.next()){
+                        int productId = resultSet.getInt(1);
+                        shoppingCartProductIds.add(productId);
+                    }
+                }
+            }
             try (PreparedStatement stmt = conn.prepareStatement(FIND_BY_ID)) {
                 stmt.setInt(1, id);
                 try (ResultSet resultSet = stmt.executeQuery()) {
@@ -92,21 +77,9 @@ public class JdbcOrderRepository implements OrderRepository {
                         String customerName = resultSet.getString(1);
                         Date createDate = resultSet.getTimestamp(2);
                         Date shipDate = resultSet.getTimestamp(3);
-                        String ids = resultSet.getString(4);
-                        ObjectMapper mapper = new ObjectMapper();
-                        JavaType type = mapper.getTypeFactory().
-                                constructCollectionType(List.class, Integer.class);
-                        // TODO: создать OrderItem и там хранить id
-                        ArrayList<Integer> shoppingCartProductIds = null;
-                        try {
-                            shoppingCartProductIds = mapper.readValue(ids, type);
-                        } catch (IOException e) {
-                            shoppingCartProductIds = new ArrayList<>();
-                        }
                         return new Order(id, customerName, shoppingCartProductIds, createDate, shipDate);
                     }
-                    // TODO: моджет стоит бросить исключение
-                    return null;
+                    throw new RepositoryException("Order not found");
                 }
             }
         } catch (SQLException e) {
@@ -117,7 +90,21 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public List<Order> getOrders(String customerUsername) throws RepositoryException {
         try (Connection conn = dataSource.getConnection()) {
-            List<Order> orders = new ArrayList<>();
+            Map<Integer, ArrayList<Integer>> orderItems = new HashMap<>();
+            try (PreparedStatement stmt = conn.prepareStatement(FIND_ITEM_BY_USER_NAME)) {
+                stmt.setString(1, customerUsername);
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    while (resultSet.next()) {
+                        Integer orderId = resultSet.getInt(1);
+                        Integer productId = resultSet.getInt(1);
+                        ArrayList<Integer> products = orderItems.putIfAbsent(orderId, new ArrayList<>(Collections.singletonList(productId)));
+                        if(products != null){
+                            products.add(productId);
+                        }
+                    }
+                }
+            }
+            List<Order> orders = new ArrayList<>(orderItems.keySet().size());
             try (PreparedStatement stmt = conn.prepareStatement(FIND_BY_USER_NAME)) {
                 stmt.setString(1, customerUsername);
                 try (ResultSet resultSet = stmt.executeQuery()) {
@@ -125,19 +112,7 @@ public class JdbcOrderRepository implements OrderRepository {
                         Integer id = resultSet.getInt(1);
                         Date createDate = resultSet.getTimestamp(2);
                         Date shipDate = resultSet.getTimestamp(3);
-                        // TODO: создать OrderItem и там хранить id
-                        String ids = resultSet.getString(4);
-                        ObjectMapper mapper = new ObjectMapper();
-                        JavaType type = mapper.getTypeFactory().
-                                constructCollectionType(List.class, Integer.class);
-                        // TODO: создать OrderItem и там хранить id
-                        ArrayList<Integer> shoppingCartProductIds = null;
-                        try {
-                            shoppingCartProductIds = mapper.readValue(ids, type);
-                        } catch (IOException e) {
-                            shoppingCartProductIds = new ArrayList<>();
-                        }
-//                        ArrayList<Integer> shoppingCartProductIds = new ArrayList<>();
+                        ArrayList<Integer> shoppingCartProductIds = orderItems.get(id);
                         orders.add(new Order(id, customerUsername, shoppingCartProductIds, createDate, shipDate));
                     }
                 }
@@ -167,7 +142,6 @@ public class JdbcOrderRepository implements OrderRepository {
                 stmt.setString(1, order.getUsername());
                 stmt.setTimestamp(2, new Timestamp(order.getDateCreated().getTime()));
                 stmt.setTimestamp(3, new Timestamp(order.getDateShipped().getTime()));
-//                stmt.setString(4, order.getProductIds().toString());
                 stmt.setInt(4, order.getId());
                 stmt.executeUpdate();
             }

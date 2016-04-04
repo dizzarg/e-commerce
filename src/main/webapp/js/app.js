@@ -1,6 +1,6 @@
 (function () {
 
-    new ApplicationModule();
+    ApplicationModule();
 
     $('li').on('click', function () {
         $('.active').removeClass('active');
