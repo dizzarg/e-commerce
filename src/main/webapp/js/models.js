@@ -8,9 +8,9 @@ var Order = function (data, products) {
     var self = this;
     self.products = [];
     self.createOrder = function (data, products) {
-        if(data.id)
+        if (data.id)
             self.id = data.id;
-        if(data.dateCreated){
+        if (data.dateCreated) {
             var formatter = new Intl.DateTimeFormat("ru", {
                 weekday: "long",
                 year: "numeric",
@@ -22,12 +22,12 @@ var Order = function (data, products) {
             });
             self.dateCreated = formatter.format(new Date(data.dateCreated));
         }
-        if(data.dateShipped)
+        if (data.dateShipped)
             self.dateShipped = new Date(data.dateShipped);
-        if(data.productIds && data.productIds){
-            for (var i=0; i<data.productIds.length; i++){
-                for (var j=0; j<products.length; j++){
-                    if(products[j].id==data.productIds[i]){
+        if (data.productIds && data.productIds) {
+            for (var i = 0; i < data.productIds.length; i++) {
+                for (var j = 0; j < products.length; j++) {
+                    if (products[j].id == data.productIds[i]) {
                         self.products.push(products[j]);
                         break;
                     }
@@ -36,7 +36,7 @@ var Order = function (data, products) {
         }
     };
 
-    if(data && products){
+    if (data && products) {
         self.createOrder(data, products);
     }
 };
@@ -45,13 +45,13 @@ var Payment = function (data) {
     var self = this;
     self.orders = [];
     self.createPayment = function (data) {
-        if(data.id)
+        if (data.id)
             self.id = data.id;
-        if(data.amount)
-            self.amount = formatter.format(data.amount/100);
+        if (data.amount)
+            self.amount = formatter.format(data.amount / 100);
     };
 
-    if(data){
+    if (data) {
         self.createPayment(data);
     }
 };
@@ -59,30 +59,30 @@ var Payment = function (data) {
 var Product = function (data) {
     var self = this;
     self.createProduct = function (data) {
-        if(data.id)
+        if (data.id)
             self.id = data.id;
-        if(data.title)
+        if (data.title)
             self.title = data.title;
-        if(data.category)
+        if (data.category)
             self.category = data.category;
-        if(data.manufacturer)
+        if (data.manufacturer)
             self.manufacturer = data.manufacturer;
-        if(data.description){
+        if (data.description) {
             self.fullDescription = data.description;
-            if(data.description.length > 120){
+            if (data.description.length > 120) {
                 self.shortDescription = data.description.substring(0, 120) + '...';
             } else {
                 self.shortDescription = data.description;
             }
         }
-        if(data.img)
+        if (data.img)
             self.img = data.img;
-        if(data.price) {
+        if (data.price) {
             self.p = data.price;
-            self.price = formatter.format(data.price/100);
+            self.price = formatter.format(data.price / 100);
         }
     };
-    if(data){
+    if (data) {
         self.createProduct(data);
     }
 };
@@ -94,22 +94,22 @@ var Customer = function (data) {
     self.totalPrice = ko.observable(0);
 
     self.createCustomer = function (data) {
-        if(data.username)
+        if (data.username)
             self.username = data.username;
-        if(data.password)
+        if (data.password)
             self.password = data.password;
-        if(data.email)
+        if (data.email)
             self.email = data.email;
-        if(data.firstName)
+        if (data.firstName)
             self.firstName = data.firstName;
-        if(data.lastName)
+        if (data.lastName)
             self.lastName = data.lastName;
-        if(data.address)
+        if (data.address)
             self.address = data.address;
-        if(data.phoneNumber)
+        if (data.phoneNumber)
             self.phoneNumber = data.phoneNumber;
-        if(data.shoppingCart && data.shoppingCart.productIds){
-            for (var i=0; i<data.shoppingCart.productIds.length; i++){
+        if (data.shoppingCart && data.shoppingCart.productIds) {
+            for (var i = 0; i < data.shoppingCart.productIds.length; i++) {
                 self.shoppingCart.push(data.shoppingCart.productIds[i])
             }
         }
@@ -118,19 +118,19 @@ var Customer = function (data) {
     self.updateShoppingCart = function (products) {
         self.products.removeAll();
         var total = 0;
-        for (var i=0; i<self.shoppingCart().length; i++){
-            for (var j=0; j<products.length; j++){
-                if(products[j].id==self.shoppingCart()[i]){
+        for (var i = 0; i < self.shoppingCart().length; i++) {
+            for (var j = 0; j < products.length; j++) {
+                if (products[j].id == self.shoppingCart()[i]) {
                     self.products.push(products[j]);
-                    total+=products[j].p;
+                    total += products[j].p;
                     break;
                 }
             }
         }
-        self.totalPrice(formatter.format(total/100));
+        self.totalPrice(formatter.format(total / 100));
     };
 
-    if(data){
+    if (data) {
         self.createCustomer(data);
     }
 };

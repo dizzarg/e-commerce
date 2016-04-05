@@ -1,16 +1,16 @@
 package ru.kadyrov.electron.commerce.controllers;
 
+import org.springframework.web.bind.annotation.*;
 import ru.kadyrov.electron.commerce.models.Customer;
 import ru.kadyrov.electron.commerce.models.Order;
 import ru.kadyrov.electron.commerce.services.CustomerService;
-import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/customers")
-public class CustomerController extends ApiController{
+public class CustomerController extends ApiController {
 
     private final CustomerService customerService;
 
@@ -20,7 +20,7 @@ public class CustomerController extends ApiController{
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public void addCustomer(@RequestBody Customer customer){
+    public void addCustomer(@RequestBody Customer customer) {
         customerService.addCustomer(customer);
     }
 

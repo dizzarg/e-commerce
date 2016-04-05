@@ -17,14 +17,18 @@ public class ProductController {
     private ShopService shopService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<Integer> addProduct(
-            @RequestBody ProductContext param){
+    public
+    @ResponseBody
+    ResponseEntity<Integer> addProduct(
+            @RequestBody ProductContext param) {
         Product product = shopService.addProduct(param);
         return ResponseEntity.ok(product.getId());
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public @ResponseBody List<Product> products(){
+    public
+    @ResponseBody
+    List<Product> products() {
         return shopService.getProducts();
     }
 

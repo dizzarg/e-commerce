@@ -4,7 +4,7 @@
 <head>
     <link rel="stylesheet" type="text/css" media="all"
           href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
-          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}"/>
 </head>
 
 <body>
@@ -16,15 +16,19 @@
         <div data-bind="foreach: products">
             <div class="media">
                 <div class="pull-left">
-                    <img class="media-object" data-bind="attr: { 'src': 'http://placehold.it/120x120?text='+title, 'alt': title }">
+                    <img class="media-object"
+                         data-bind="attr: { 'src': 'http://placehold.it/120x120?text='+title, 'alt': title }">
                 </div>
                 <div class="media-body">
                     <h4 class="media-heading" data-bind="text: title">Title</h4>
                     <p data-bind="text: fullDescription">...</p>
-                    <p><b th:utext="#{electron.commerce.product.price.label}">Price</b><i data-bind="text: price"></i></p>
+                    <p><b th:utext="#{electron.commerce.product.price.label}">Price</b><i data-bind="text: price"></i>
+                    </p>
                 </div>
                 <div class="pull-right">
-                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary" th:utext="#{electron.commerce.cart.remove.label}">Remove</button>
+                    <button type="button" data-bind="click: $root.removeProduct" class="btn btn-primary"
+                            th:utext="#{electron.commerce.cart.remove.label}">Remove
+                    </button>
                 </div>
             </div>
         </div>
@@ -36,7 +40,8 @@
                 </h4>
             </div>
             <div class="pull-right">
-                <a href="#/orders/create" class="btn btn-primary" th:utext="#{electron.commerce.order.create.label}">New order</a>
+                <a href="#/orders/create" class="btn btn-primary" th:utext="#{electron.commerce.order.create.label}">New
+                    order</a>
             </div>
         </div>
     </div>

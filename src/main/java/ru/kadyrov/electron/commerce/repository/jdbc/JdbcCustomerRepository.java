@@ -1,10 +1,10 @@
 package ru.kadyrov.electron.commerce.repository.jdbc;
 
+import org.springframework.stereotype.Repository;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.models.Customer;
 import ru.kadyrov.electron.commerce.models.ShoppingCart;
 import ru.kadyrov.electron.commerce.repository.CustomerRepository;
-import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -44,7 +44,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
                 return customer;
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot create customer",e);
+            throw new RepositoryException("Cannot create customer", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
             try (PreparedStatement stmt = conn.prepareStatement(FIND_BY_NAME)) {
                 stmt.setString(1, customerUsername);
                 try (ResultSet resultSet = stmt.executeQuery()) {
-                    if (resultSet.next()){
+                    if (resultSet.next()) {
                         Integer id = resultSet.getInt(1);
                         String password = resultSet.getString(2);
                         String email = resultSet.getString(3);
@@ -64,13 +64,13 @@ public class JdbcCustomerRepository implements CustomerRepository {
                         String phoneNumber = resultSet.getString(7);
                         ShoppingCart cart = customerCart.get(customerUsername);
                         return new Customer(customerUsername, password, email,
-                                firstName,lastName, address, phoneNumber, cart);
+                                firstName, lastName, address, phoneNumber, cart);
                     }
                     throw new RepositoryException("Customer not found");
                 }
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load customer",e);
+            throw new RepositoryException("Cannot load customer", e);
         }
     }
 
@@ -80,7 +80,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
             List<Customer> customers = new ArrayList<>();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet resultSet = stmt.executeQuery(FIND_ALL)) {
-                    while (resultSet.next()){
+                    while (resultSet.next()) {
                         Integer id = resultSet.getInt(1);
                         String customerUsername = resultSet.getString(2);
                         String password = resultSet.getString(3);
@@ -91,14 +91,14 @@ public class JdbcCustomerRepository implements CustomerRepository {
                         String phoneNumber = resultSet.getString(8);
                         ShoppingCart cart = customerCart.get(customerUsername);
                         Customer customer = new Customer(customerUsername, password,
-                                email,firstName,lastName, address, phoneNumber, cart);
+                                email, firstName, lastName, address, phoneNumber, cart);
                         customers.add(customer);
                     }
                 }
             }
             return customers;
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load customers",e);
+            throw new RepositoryException("Cannot load customers", e);
         }
     }
 
@@ -117,7 +117,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
                 customerCart.put(customer.getUsername(), customer.getShoppingCart());
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot update customer",e);
+            throw new RepositoryException("Cannot update customer", e);
         }
     }
 
@@ -130,7 +130,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
                 customerCart.remove(username);
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot remove customer",e);
+            throw new RepositoryException("Cannot remove customer", e);
         }
     }
 
@@ -144,7 +144,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load customer",e);
+            throw new RepositoryException("Cannot load customer", e);
         }
     }
 }

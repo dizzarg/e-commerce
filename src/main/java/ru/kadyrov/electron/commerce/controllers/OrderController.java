@@ -1,14 +1,16 @@
 package ru.kadyrov.electron.commerce.controllers;
 
-import ru.kadyrov.electron.commerce.models.Order;
 import org.springframework.web.bind.annotation.*;
+import ru.kadyrov.electron.commerce.models.Order;
 
 @RestController
 @RequestMapping(value = "/api/orders")
 public class OrderController extends ApiController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody Order createOrder(@RequestParam("userName") String customerUsername) {
+    public
+    @ResponseBody
+    Order createOrder(@RequestParam("userName") String customerUsername) {
         return shopService.createOrder(customerUsername);
     }
 

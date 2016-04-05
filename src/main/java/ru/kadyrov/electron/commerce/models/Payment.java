@@ -3,7 +3,6 @@ package ru.kadyrov.electron.commerce.models;
 import java.util.Objects;
 
 
-
 public class Payment {
 
     private Integer id;
@@ -14,16 +13,16 @@ public class Payment {
 
     /**
      * <ul>
-     *  <li>Ожидает оплату</li>
-     *  <li>Готов к отправке</li>
-     *  <li>Отправлен</li>
-     *  <li>Платеж зачислен</li>
-     *  <li>Отменен, деньги возвращены</li>
-     *  <li>Неверный номер</li>
-     *  <li>Ошибка платежа</li>
-     *  <li>Платеж оплачен</li>
-     *  <li>Платеж возвращен</li>
-     *  <li>В процессе оплаты</li>
+     * <li>Ожидает оплату</li>
+     * <li>Готов к отправке</li>
+     * <li>Отправлен</li>
+     * <li>Платеж зачислен</li>
+     * <li>Отменен, деньги возвращены</li>
+     * <li>Неверный номер</li>
+     * <li>Ошибка платежа</li>
+     * <li>Платеж оплачен</li>
+     * <li>Платеж возвращен</li>
+     * <li>В процессе оплаты</li>
      * </ul>
      */
     public enum Status {

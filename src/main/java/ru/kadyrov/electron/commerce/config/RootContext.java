@@ -1,10 +1,9 @@
 package ru.kadyrov.electron.commerce.config;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import ru.kadyrov.electron.commerce.Application;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -12,6 +11,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
+import ru.kadyrov.electron.commerce.Application;
 
 import javax.sql.DataSource;
 
@@ -32,8 +32,8 @@ public class RootContext implements TransactionManagementConfigurer {
                 .build();
     }
 
-//    @Bean(name = "mySqlDataSource")
-    public DataSource mySqlDataSource(){
+    //    @Bean(name = "mySqlDataSource")
+    public DataSource mySqlDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://192.168.99.100:3306/ecommerce");
@@ -48,7 +48,7 @@ public class RootContext implements TransactionManagementConfigurer {
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate(){
+    public JdbcTemplate jdbcTemplate() {
         return new JdbcTemplate(dataSource());
     }
 

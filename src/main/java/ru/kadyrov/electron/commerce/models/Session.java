@@ -5,21 +5,23 @@ import ru.kadyrov.electron.commerce.exception.ModelException;
 public class Session {
 
     private final String sessionId;
-    private SessionShoppingCart shoppingCart = new SessionShoppingCart();
+
+    private final Cart shoppingCart;
 
     public Session(String sessionId) {
         this.sessionId = sessionId;
+        this.shoppingCart = new Cart(sessionId);
     }
 
-    public void addProductToShoppingCart(int productId) {
-        shoppingCart.addProduct(productId, 1);
+    public void addProductToShoppingCart(final Product product) {
+        shoppingCart.addItem(product);
     }
 
-    public void removeProductFromShoppingCart(int productId) throws ModelException {
-        shoppingCart.removeProduct(productId, 1);
+    public void removeProductFromShoppingCart(final Product product) throws ModelException {
+        shoppingCart.removeItem(product);
     }
 
-    public SessionShoppingCart getShoppingCart() {
+    public Cart getShoppingCart() {
         return shoppingCart;
     }
 

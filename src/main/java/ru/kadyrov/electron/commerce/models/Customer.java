@@ -37,7 +37,7 @@ public final class Customer {
 
     public Customer(String username, String password, String email, String firstName, String lastName, String address, String phoneNumber, ShoppingCart shoppingCart) {
         this(username, password, email, firstName, lastName, address, phoneNumber);
-        this.shoppingCart = shoppingCart == null? new ShoppingCart():shoppingCart;
+        this.shoppingCart = shoppingCart == null ? new ShoppingCart() : shoppingCart;
     }
 
     @JsonIgnore

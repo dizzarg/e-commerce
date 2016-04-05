@@ -1,13 +1,13 @@
 package ru.kadyrov.electron.commerce.services;
 
-import ru.kadyrov.electron.commerce.exception.RepositoryException;
-import ru.kadyrov.electron.commerce.exception.ShopServiceException;
-import ru.kadyrov.electron.commerce.models.Customer;
-import ru.kadyrov.electron.commerce.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kadyrov.electron.commerce.exception.RepositoryException;
+import ru.kadyrov.electron.commerce.exception.ShopServiceException;
+import ru.kadyrov.electron.commerce.models.Customer;
+import ru.kadyrov.electron.commerce.repository.CustomerRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,7 +26,7 @@ public class CustomerService {
 
     public void addCustomer(Customer customer) {
         try {
-            if(customerRepository.existsCustomer(customer.getUsername())){
+            if (customerRepository.existsCustomer(customer.getUsername())) {
                 throw new RepositoryException("Customer exists");
             }
             customerRepository.addCustomer(customer);
@@ -58,7 +58,7 @@ public class CustomerService {
         }
     }
 
-    public  void removeCustomer(String customerUsername) {
+    public void removeCustomer(String customerUsername) {
         try {
             customerRepository.removeCustomer(customerUsername);
             logger.info("Customer was removed");

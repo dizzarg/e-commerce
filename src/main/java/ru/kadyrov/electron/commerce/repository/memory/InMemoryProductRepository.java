@@ -1,10 +1,10 @@
 package ru.kadyrov.electron.commerce.repository.memory;
 
+import org.springframework.stereotype.Repository;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.models.Product;
 import ru.kadyrov.electron.commerce.models.ProductContext;
 import ru.kadyrov.electron.commerce.repository.ProductRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;

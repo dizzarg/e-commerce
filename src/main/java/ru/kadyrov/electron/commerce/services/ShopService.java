@@ -1,5 +1,9 @@
 package ru.kadyrov.electron.commerce.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kadyrov.electron.commerce.exception.ModelException;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.exception.ShopServiceException;
@@ -8,10 +12,6 @@ import ru.kadyrov.electron.commerce.repository.CustomerRepository;
 import ru.kadyrov.electron.commerce.repository.OrderRepository;
 import ru.kadyrov.electron.commerce.repository.PaymentRepository;
 import ru.kadyrov.electron.commerce.repository.ProductRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,7 +51,7 @@ public class ShopService {
         }
     }
 
-    public void removeProductFromCustomer(int productId, String customerUsername){
+    public void removeProductFromCustomer(int productId, String customerUsername) {
         try {
             Customer customer = customerRepository.getCustomer(customerUsername);
             customer.removeProductFromShoppingCart(productId);
@@ -63,7 +63,7 @@ public class ShopService {
         }
     }
 
-    public  void addProductToCustomer(int productId, String customerUsername, int amount) {
+    public void addProductToCustomer(int productId, String customerUsername, int amount) {
         try {
             if (productRepository.getProduct(productId).getQuantity() >= amount) {
                 Customer customer = customerRepository.getCustomer(customerUsername);
@@ -74,7 +74,7 @@ public class ShopService {
                 // Make the repository record the changes to customer
                 customerRepository.updateCustomer(customer);
                 logger.info("Product was added to Customer Shopping cart");
-            } else{
+            } else {
                 logger.warn("Cannot add product to Customer Shopping cart");
             }
         } catch (RepositoryException e) {
@@ -83,7 +83,7 @@ public class ShopService {
         }
     }
 
-    public  Product getProductWithId(int productId) {
+    public Product getProductWithId(int productId) {
         try {
             Product product = productRepository.getProduct(productId);
             logger.info("Product by id was loaded");
@@ -94,7 +94,7 @@ public class ShopService {
         }
     }
 
-    public  List<Product> getProducts() {
+    public List<Product> getProducts() {
         try {
             List<Product> products = productRepository.getProducts();
             logger.info("Products was loaded");
@@ -105,7 +105,7 @@ public class ShopService {
         }
     }
 
-    public  void removeProduct(int productId) {
+    public void removeProduct(int productId) {
         try {
             // If there are any customers first remove the item from their
             // carts
@@ -123,7 +123,7 @@ public class ShopService {
         }
     }
 
-    public  void updateProduct(int productId, ProductContext productParams) {
+    public void updateProduct(int productId, ProductContext productParams) {
         try {
             productRepository.updateProduct(new Product(productId, productParams));
             logger.info("Product was updated");
@@ -133,13 +133,13 @@ public class ShopService {
         }
     }
 
-    public Payment createPayment(Integer orderId){
-        try{
+    public Payment createPayment(Integer orderId) {
+        try {
             Order order = orderRepository.getOrder(orderId);
             Integer sum = 0;
-            for (Integer productId : order.getProductIds()){
+            for (Integer productId : order.getProductIds()) {
                 Product product = productRepository.getProduct(productId);
-                sum+= product.getPrice();
+                sum += product.getPrice();
             }
             Payment payment = new Payment();
             payment.setOrder(order);
@@ -147,13 +147,13 @@ public class ShopService {
             Payment payment1 = paymentRepository.addPayment(payment);
             logger.info("Payments was created");
             return payment1;
-        } catch (RepositoryException ex){
+        } catch (RepositoryException ex) {
             logger.error("Cannot create payment", ex);
             throw new ShopServiceException("Cannot create payment", ex);
         }
     }
 
-    public List<Payment> getPayments(){
+    public List<Payment> getPayments() {
         try {
             List<Payment> payments = paymentRepository.getPayments();
             logger.info("Payments was loaded");
@@ -197,7 +197,7 @@ public class ShopService {
         }
     }
 
-    public  Order getOrder(int orderId) {
+    public Order getOrder(int orderId) {
         try {
             Order order = orderRepository.getOrder(orderId);
             logger.info("Order was loaded");
@@ -208,9 +208,9 @@ public class ShopService {
         }
     }
 
-    public  List<Order> getOrders(String customerUsername) {
+    public List<Order> getOrders(String customerUsername) {
         try {
-            if(!customerRepository.existsCustomer(customerUsername)){
+            if (!customerRepository.existsCustomer(customerUsername)) {
                 throw new RepositoryException("Customer does not exist");
             }
             List<Order> orders = orderRepository.getOrders(customerUsername);
@@ -222,7 +222,7 @@ public class ShopService {
         }
     }
 
-    public  void updateOrder(Order order) {
+    public void updateOrder(Order order) {
         try {
             orderRepository.updateOrder(order);
             logger.info("Orders was updated");
@@ -232,7 +232,7 @@ public class ShopService {
         }
     }
 
-    public  void removeOrder(int orderId) {
+    public void removeOrder(int orderId) {
         try {
             orderRepository.removeOrder(orderId);
             logger.info("Orders was removed");
@@ -242,4 +242,20 @@ public class ShopService {
         }
     }
 
+    @Inject
+    CartService cartService;
+
+    public Cart getCart(String sessionID) {
+        return cartService.createCart(sessionID);
+    }
+
+    public void addToCart(int productId, String sessionId) {
+        try {
+            Product product = productRepository.getProduct(productId);
+            cartService.getCart(sessionId).addItem(product);
+        } catch (RepositoryException e){
+            logger.error("Could not remove order", e);
+            throw new ShopServiceException("Could not remove order: " + e.getMessage(), e);
+        }
+    }
 }

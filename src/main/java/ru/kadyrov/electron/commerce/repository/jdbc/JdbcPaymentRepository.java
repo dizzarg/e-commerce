@@ -1,7 +1,6 @@
 package ru.kadyrov.electron.commerce.repository.jdbc;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,8 +10,10 @@ import ru.kadyrov.electron.commerce.models.Payment;
 import ru.kadyrov.electron.commerce.repository.PaymentRepository;
 
 import javax.inject.Inject;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
 
     @Override
     public Optional<Payment> getById(Integer id) throws RepositoryException {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID, new Object[] {id}, new PaymentRowMapper()));
+        return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID, new Object[]{id}, new PaymentRowMapper()));
     }
 
     private class PaymentRowMapper implements RowMapper<Payment> {

@@ -1,13 +1,12 @@
-
 var ApplicationVM = function (serverModule) {
     var self = this;
     self.server = serverModule;
     self.searchText = ko.observable("");
     self.allProducts = ko.observableArray([]);
-    self.products = ko.computed(function() {
+    self.products = ko.computed(function () {
         var search = self.searchText().trim().toLowerCase();
-        if(search.length==0) return self.allProducts();
-        return $.grep(self.allProducts(), function(product) {
+        if (search.length == 0) return self.allProducts();
+        return $.grep(self.allProducts(), function (product) {
             return product.title.toLowerCase().indexOf(search) >= 0;
         });
     });
@@ -29,12 +28,12 @@ var ApplicationVM = function (serverModule) {
         self.server.removeProductFromCustomer(product.id, self.customer().username, function () {
             self.customer().shoppingCart.remove(product.id);
             self.customer().updateShoppingCart(self.allProducts());
-            if(self.customer().shoppingCart().length<=0)
+            if (self.customer().shoppingCart().length <= 0)
                 window.location.hash = "/";
         });
     };
     self.createPayment = function (order) {
-        self.server.createPayment(order, 1,  function (data) {
+        self.server.createPayment(order, 1, function (data) {
             window.location.hash = '/';
         });
     };
@@ -42,7 +41,7 @@ var ApplicationVM = function (serverModule) {
         self.customer(new Customer(data));
     });
     self.server.loadProducts(function (data) {
-        for (var i=0; i<data.length; i++){
+        for (var i = 0; i < data.length; i++) {
             var product = new Product(data[i]);
             self.allProducts.push(product);
         }
@@ -50,61 +49,61 @@ var ApplicationVM = function (serverModule) {
 
 };
 
-var ServerModule = function() {
+var ServerModule = function () {
     var self = this;
     self.loadProducts = function (callback) {
         $.getJSON('/api/products', function (data) {
-            if(callback){
+            if (callback) {
                 callback(data)
             }
         });
     };
     self.loadCustomer = function (userName, callback) {
-        $.getJSON('/api/customers/'+userName, function (data) {
-            if(callback){
+        $.getJSON('/api/customers/' + userName, function (data) {
+            if (callback) {
                 callback(data)
             }
         });
     };
     self.loadOrders = function (userName, callback) {
-        $.getJSON('/api/customers/'+userName+'/orders', function (data) {
-            if(callback){
+        $.getJSON('/api/customers/' + userName + '/orders', function (data) {
+            if (callback) {
                 callback(data)
             }
         });
     };
     self.loadPayments = function (callback) {
         $.getJSON('/api/payments', function (data) {
-            if(callback){
+            if (callback) {
                 callback(data)
             }
         });
     };
     self.addProductToCustomer = function (id, userName, callback) {
-        $.post('/api/shop/add',{productId: id, userName: userName, amount: 1}, function () {
-            if(callback){
+        $.post('/api/shop/add', {productId: id, userName: userName, amount: 1}, function () {
+            if (callback) {
                 callback()
             }
         });
     };
     self.removeProductFromCustomer = function (id, userName, callback) {
-        $.post('/api/shop/remove',{productId: id, userName: userName, amount: 1}, function () {
-            if(callback){
+        $.post('/api/shop/remove', {productId: id, userName: userName, amount: 1}, function () {
+            if (callback) {
                 callback()
             }
         });
     };
     self.createOrder = function (userName, callback) {
-        $.post('/api/orders',{userName: userName},function (data) {
-            if(callback){
+        $.post('/api/orders', {userName: userName}, function (data) {
+            if (callback) {
                 callback(data)
             }
         });
     };
 
     self.createPayment = function (order, amount, callback) {
-        $.post('/api/payments', {orderId: order.id, amount:amount}, function (data) {
-            if(callback){
+        $.post('/api/payments', {orderId: order.id, amount: amount}, function (data) {
+            if (callback) {
                 callback(data)
             }
         });
@@ -149,7 +148,7 @@ var ApplicationModule = function () {
             $('#content').load('/orders/list', function () {
                 self.server.loadOrders(self.appvm.customer().username, function (data) {
                     self.appvm.orders.removeAll();
-                    for (var i =0 ;i<data.length; i++) {
+                    for (var i = 0; i < data.length; i++) {
                         self.appvm.orders.push(new Order(data[i], self.appvm.products()))
                     }
                     ko.applyBindings(self.appvm, document.getElementById("orders"));
@@ -171,7 +170,7 @@ var ApplicationModule = function () {
             $('#content').load('/payments/list', function () {
                 self.server.loadPayments(function (data) {
                     self.appvm.payments.removeAll();
-                    for (var i =0 ;i<data.length; i++) {
+                    for (var i = 0; i < data.length; i++) {
                         self.appvm.payments.push(new Payment(data[i]))
                     }
                     ko.applyBindings(self.appvm, document.getElementById("payments"));

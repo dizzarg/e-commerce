@@ -4,7 +4,7 @@
 <head>
     <link rel="stylesheet" type="text/css" media="all"
           href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
-          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}"/>
 </head>
 
 <body>
@@ -34,7 +34,9 @@
         <h3 th:utext="#{electron.commerce.order.header.label}">My order</h3>
         <div class="panel panel-default" data-bind="with: currentOrder">
             <div class="panel-heading" data-bind="text: 'Order #'+id+' was created '+dateCreated"
-                 th:attr="data-bind = 'text: \'' +#{electron.commerce.order.description.label('\'+id+\'','\'+dateCreated')}">title</div>
+                 th:attr="data-bind = 'text: \'' +#{electron.commerce.order.description.label('\'+id+\'','\'+dateCreated')}">
+                title
+            </div>
             <div class="panel-body">
                 <h4 th:utext="#{electron.commerce.order.content.label}">Content</h4>
                 <ul class="list-group" data-bind="foreach: products">
@@ -48,8 +50,10 @@
                         <input class="form-control" type="text" value="4111 1111 1111 1111"/>
                         <div class="form-inline">
                             <div class="form-group">
-                                <label for="expDate" th:utext="#{electron.commerce.payment.deatil.expdate.label}">Expiration date</label>
-                                <input type="text" class="form-control" id="expDate" name="expDate" placeholder="03/2020">
+                                <label for="expDate" th:utext="#{electron.commerce.payment.deatil.expdate.label}">Expiration
+                                    date</label>
+                                <input type="text" class="form-control" id="expDate" name="expDate"
+                                       placeholder="03/2020">
                             </div>
                             <div class="form-group">
                                 <label for="cvvcvc">CVV/CVC</label>
@@ -58,7 +62,9 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" data-bind="click: $root.createPayment" class="btn btn-primary" th:utext="#{electron.commerce.payment.payaction.label}">Pay</button>
+                <button type="button" data-bind="click: $root.createPayment" class="btn btn-primary"
+                        th:utext="#{electron.commerce.payment.payaction.label}">Pay
+                </button>
             </div>
         </div>
     </div>

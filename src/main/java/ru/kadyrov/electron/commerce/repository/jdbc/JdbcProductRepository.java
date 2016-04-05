@@ -1,10 +1,10 @@
 package ru.kadyrov.electron.commerce.repository.jdbc;
 
+import org.springframework.stereotype.Repository;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.models.Product;
 import ru.kadyrov.electron.commerce.models.ProductContext;
 import ru.kadyrov.electron.commerce.repository.ProductRepository;
-import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -19,8 +19,8 @@ public class JdbcProductRepository implements ProductRepository {
     private static final String FIND_BY_ID = "SELECT id, title,category,manufacturer,description,img,quantity,price FROM products where id=?";
     private static final String DELETE_BY_ID = "DELETE FROM products where id=?";
     private static final String UPDATE_BY_ID = "UPDATE products SET title = ?, category = ?,manufacturer = ?,description = ?,img = ?,quantity = ?,price = ? where id=?";
-    private static final String DECREASE_QUANTITY="UPDATE products SET quantity=quantity-1 WHERE id = ?";
-    private static final String INCREASE_QUANTITY="UPDATE products SET quantity=quantity+1 WHERE id = ?";
+    private static final String DECREASE_QUANTITY = "UPDATE products SET quantity=quantity-1 WHERE id = ?";
+    private static final String INCREASE_QUANTITY = "UPDATE products SET quantity=quantity+1 WHERE id = ?";
     private static final String INSERT = "INSERT INTO products (title,category,manufacturer,description,img,quantity,price) VALUES (?,?,?,?,?,?,?);";
 
     @Inject
@@ -39,14 +39,14 @@ public class JdbcProductRepository implements ProductRepository {
                 stmt.setInt(7, productContext.getPrice());
                 stmt.executeUpdate();
                 ResultSet resultSet = stmt.getGeneratedKeys();
-                if(resultSet.next()){
+                if (resultSet.next()) {
                     int id = resultSet.getInt(1);
                     return new Product(id, productContext);
                 }
                 throw new RepositoryException("Database cannot generate primary key value");
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot create product",e);
+            throw new RepositoryException("Cannot create product", e);
         }
     }
 
@@ -56,7 +56,7 @@ public class JdbcProductRepository implements ProductRepository {
             try (PreparedStatement stmt = conn.prepareStatement(FIND_BY_ID)) {
                 stmt.setInt(1, id);
                 try (ResultSet resultSet = stmt.executeQuery()) {
-                    if (resultSet.next()){
+                    if (resultSet.next()) {
                         String title = resultSet.getString(2);
                         String category = resultSet.getString(3);
                         String manufacturer = resultSet.getString(4);
@@ -73,7 +73,7 @@ public class JdbcProductRepository implements ProductRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load product",e);
+            throw new RepositoryException("Cannot load product", e);
         }
     }
 
@@ -83,7 +83,7 @@ public class JdbcProductRepository implements ProductRepository {
             List<Product> products = new ArrayList<>();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet resultSet = stmt.executeQuery(FIND_ALL)) {
-                    while (resultSet.next()){
+                    while (resultSet.next()) {
                         int id = resultSet.getInt(1);
                         String title = resultSet.getString(2);
                         String category = resultSet.getString(3);
@@ -101,7 +101,7 @@ public class JdbcProductRepository implements ProductRepository {
             }
             return products;
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load products",e);
+            throw new RepositoryException("Cannot load products", e);
         }
     }
 
@@ -113,7 +113,7 @@ public class JdbcProductRepository implements ProductRepository {
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot remove product",e);
+            throw new RepositoryException("Cannot remove product", e);
         }
     }
 
@@ -132,7 +132,7 @@ public class JdbcProductRepository implements ProductRepository {
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot update product",e);
+            throw new RepositoryException("Cannot update product", e);
         }
     }
 
@@ -141,7 +141,7 @@ public class JdbcProductRepository implements ProductRepository {
         try (Connection conn = dataSource.getConnection()) {
             executeBatch(ids, conn, DECREASE_QUANTITY);
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot decrease quantity for product",e);
+            throw new RepositoryException("Cannot decrease quantity for product", e);
         }
     }
 
@@ -150,7 +150,7 @@ public class JdbcProductRepository implements ProductRepository {
         try (Connection conn = dataSource.getConnection()) {
             executeBatch(ids, conn, INCREASE_QUANTITY);
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot increase quantity for product",e);
+            throw new RepositoryException("Cannot increase quantity for product", e);
         }
     }
 

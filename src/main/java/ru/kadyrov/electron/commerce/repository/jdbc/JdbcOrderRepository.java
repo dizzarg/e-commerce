@@ -1,11 +1,11 @@
 package ru.kadyrov.electron.commerce.repository.jdbc;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.models.Customer;
 import ru.kadyrov.electron.commerce.models.Order;
 import ru.kadyrov.electron.commerce.repository.OrderRepository;
-import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -35,12 +35,12 @@ public class JdbcOrderRepository implements OrderRepository {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, customer.getUsername());
-                stmt.setTimestamp(2,  new Timestamp(System.currentTimeMillis()));
+                stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 stmt.executeUpdate();
                 ResultSet resultSet = stmt.getGeneratedKeys();
-                if(resultSet.next()){
+                if (resultSet.next()) {
                     int id = resultSet.getInt(1);
-                    for (Integer productId: customer.getShoppingCart().getProductIds()) {
+                    for (Integer productId : customer.getShoppingCart().getProductIds()) {
                         try (PreparedStatement itemStmt = conn.prepareCall(INSERT_ITEM)) {
                             itemStmt.setInt(1, id);
                             itemStmt.setInt(2, productId);
@@ -53,7 +53,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot create order",e);
+            throw new RepositoryException("Cannot create order", e);
         }
     }
 
@@ -64,7 +64,7 @@ public class JdbcOrderRepository implements OrderRepository {
             try (PreparedStatement stmt = conn.prepareStatement(FIND_ITEM_BY_ORDER_ID)) {
                 stmt.setInt(1, id);
                 try (ResultSet resultSet = stmt.executeQuery()) {
-                    while (resultSet.next()){
+                    while (resultSet.next()) {
                         int productId = resultSet.getInt(1);
                         shoppingCartProductIds.add(productId);
                     }
@@ -73,7 +73,7 @@ public class JdbcOrderRepository implements OrderRepository {
             try (PreparedStatement stmt = conn.prepareStatement(FIND_BY_ID)) {
                 stmt.setInt(1, id);
                 try (ResultSet resultSet = stmt.executeQuery()) {
-                    if (resultSet.next()){
+                    if (resultSet.next()) {
                         String customerName = resultSet.getString(1);
                         Date createDate = resultSet.getTimestamp(2);
                         Date shipDate = resultSet.getTimestamp(3);
@@ -83,7 +83,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load customer",e);
+            throw new RepositoryException("Cannot load customer", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class JdbcOrderRepository implements OrderRepository {
                         Integer orderId = resultSet.getInt(1);
                         Integer productId = resultSet.getInt(1);
                         ArrayList<Integer> products = orderItems.putIfAbsent(orderId, new ArrayList<>(Collections.singletonList(productId)));
-                        if(products != null){
+                        if (products != null) {
                             products.add(productId);
                         }
                     }
@@ -108,7 +108,7 @@ public class JdbcOrderRepository implements OrderRepository {
             try (PreparedStatement stmt = conn.prepareStatement(FIND_BY_USER_NAME)) {
                 stmt.setString(1, customerUsername);
                 try (ResultSet resultSet = stmt.executeQuery()) {
-                    while (resultSet.next()){
+                    while (resultSet.next()) {
                         Integer id = resultSet.getInt(1);
                         Date createDate = resultSet.getTimestamp(2);
                         Date shipDate = resultSet.getTimestamp(3);
@@ -119,7 +119,7 @@ public class JdbcOrderRepository implements OrderRepository {
             }
             return orders;
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot load orders",e);
+            throw new RepositoryException("Cannot load orders", e);
         }
     }
 
@@ -131,7 +131,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot remove order",e);
+            throw new RepositoryException("Cannot remove order", e);
         }
     }
 
@@ -146,7 +146,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new RepositoryException("Cannot update order",e);
+            throw new RepositoryException("Cannot update order", e);
         }
     }
 }

@@ -4,17 +4,19 @@
 <head>
     <link rel="stylesheet" type="text/css" media="all"
           href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
-          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}"/>
 </head>
 
 <body>
 <!-- TODO: create admin module and add it there -->
 <div th:fragment="addProduct">
     <form role="form" class="form-horizontal">
-        <div class="form-group text-right" th:each="x : ${#strings.arraySplit('title,category,manufacturer,description,price,quantity',',')}">
+        <div class="form-group text-right"
+             th:each="x : ${#strings.arraySplit('title,category,manufacturer,description,price,quantity',',')}">
             <label class="col-sm-2 control-label" for="title" th:for="${x}" th:text="${#strings.capitalize(x)}"></label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" th:id="${x}" th:name="${x}" th:placeholder="${#strings.capitalize(x)}" id="title" name="title" placeholder="Title">
+                <input type="text" class="form-control" th:id="${x}" th:name="${x}"
+                       th:placeholder="${#strings.capitalize(x)}" id="title" name="title" placeholder="Title">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
@@ -40,7 +42,8 @@
                     <b class="col-sm-3" th:utext="#{electron.commerce.product.price.label}">Price</b>:
                     <span class="col-sm-9" data-bind="text: price"></span>
                     <hr>
-                    <a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default" role="button" th:utext="#{electron.commerce.product.more.label}">More</a>
+                    <a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default"
+                       role="button" th:utext="#{electron.commerce.product.more.label}">More</a>
                     <a data-bind="click: $parent.addProduct" class="btn btn-primary" role="button">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         <i th:text="#{electron.commerce.cart.add.label}" th:remove="tag">Add to Cart</i>
