@@ -1,5 +1,6 @@
 package ru.kadyrov.electron.commerce.config;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.kadyrov.electron.commerce.Application;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,6 +45,11 @@ public class RootContext implements TransactionManagementConfigurer {
     @Bean
     public PlatformTransactionManager txManager() {
         return new DataSourceTransactionManager(dataSource());
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplate(){
+        return new JdbcTemplate(dataSource());
     }
 
     @Override

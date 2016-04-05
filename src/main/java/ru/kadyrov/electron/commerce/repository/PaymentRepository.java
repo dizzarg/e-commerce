@@ -5,10 +5,13 @@ import ru.kadyrov.electron.commerce.models.Payment;
 import ru.kadyrov.electron.commerce.models.PaymentContext;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PaymentRepository {
 
-    Payment addPayment(Payment context) throws RepositoryException;
+    Payment addPayment(Payment payment) throws RepositoryException;
 
     List<Payment> getPayments() throws RepositoryException;
+
+    Optional<Payment> getById(Integer id) throws RepositoryException;
 }

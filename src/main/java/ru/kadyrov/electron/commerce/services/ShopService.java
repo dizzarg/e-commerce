@@ -33,7 +33,7 @@ public class ShopService {
     public ShopService(@Named("jdbcCustomerRepository") CustomerRepository customerRepository,
                        @Named("jdbcProductRepository") ProductRepository productRepository,
                        @Named("jdbcOrderRepository") OrderRepository orderRepository,
-                       PaymentRepository paymentRepository) {
+                       @Named("jdbcPaymentRepository") PaymentRepository paymentRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
