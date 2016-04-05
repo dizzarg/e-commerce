@@ -12,14 +12,18 @@
     <div id="payments">
         <h3 th:utext="#{electron.commerce.payments.label}">Payments</h3>
         <table class="table table-striped">
-            <tr>
-                <th>#</th>
-                <th>Amount</th>
-            </tr>
-            <tr data-bind="foreach: payments">
-                <td data-bind="text: id"></td>
-                <td data-bind="text: amount"></td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: payments">
+                <tr>
+                    <td data-bind="text: id"></td>
+                    <td data-bind="text: amount"></td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>
