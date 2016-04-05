@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="/webjars/bootstrap/3.3.6/css/bootstrap.css"
+          th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+</head>
+
+<body>
+<!-- TODO: create admin module and add it there -->
+<div th:fragment="addProduct">
+    <form role="form" class="form-horizontal">
+        <div class="form-group text-right" th:each="x : ${#strings.arraySplit('title,category,manufacturer,description,price,quantity',',')}">
+            <label class="col-sm-2 control-label" for="title" th:for="${x}" th:text="${#strings.capitalize(x)}"></label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" th:id="${x}" th:name="${x}" th:placeholder="${#strings.capitalize(x)}" id="title" name="title" placeholder="Title">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+<div th:fragment="list">
+    <div id="products" data-bind="foreach: products">
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <img data-bind="attr: { 'src': 'http://placehold.it/300x200?text='+title, 'alt': title }"/>
+                <div class="caption">
+                    <h3 data-bind="text: title">Title</h3>
+                    <b class="col-sm-3" th:utext="#{electron.commerce.product.category.label}">Category</b>:
+                    <span class="col-sm-9" data-bind="text: category"></span>
+                    <hr>
+                    <b class="col-sm-3" th:utext="#{electron.commerce.product.manufacturer.label}">Manufacturer</b>:
+                    <span class="col-sm-9" data-bind="text: manufacturer"></span>
+                    <hr>
+                    <b class="col-sm-3" th:utext="#{electron.commerce.product.description.label}">Description</b>:
+                    <span class="col-sm-9" data-bind="text: shortDescription"></span>
+                    <br>
+                    <hr>
+                    <b class="col-sm-3" th:utext="#{electron.commerce.product.price.label}">Price</b>:
+                    <span class="col-sm-9" data-bind="text: price"></span>
+                    <hr>
+                    <a href="#/product/1" data-bind="attr: { 'href': '#/product/'+id }" class="btn btn-default" role="button" th:utext="#{electron.commerce.product.more.label}">More</a>
+                    <a data-bind="click: $parent.addProduct" class="btn btn-primary" role="button">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        <i th:text="#{electron.commerce.cart.add.label}" th:remove="tag">Add to Cart</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:fragment="one">
+    <div id="product" data-bind="with: selectedProduct()">
+        <div class="thumbnail">
+            <img data-bind="attr: { 'src': 'http://placehold.it/300x200?text='+title, 'alt': title }"/>
+            <div class="caption">
+                <h3 data-bind="text: title">Title</h3>
+                <br>
+                <hr>
+                <b class="col-sm-3" th:utext="#{electron.commerce.product.category.label}">Category</b>:
+                <span class="col-sm-9" data-bind="text: category"></span>
+                <hr>
+                <b class="col-sm-3" th:utext="#{electron.commerce.product.manufacturer.label}">Manufacturer</b>:
+                <span class="col-sm-9" data-bind="text: manufacturer"></span>
+                <hr>
+                <b class="col-sm-3" th:utext="#{electron.commerce.product.description.label}">Description</b>:
+                <span class="col-sm-9" data-bind="text: fullDescription"></span>
+                <br>
+                <hr>
+                <b th:utext="#{electron.commerce.product.price.label}">Price</b>:
+                <span data-bind="text: price"></span>
+                <hr>
+                <a data-bind="click: $parent.addProduct" class="btn btn-primary" role="button">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <i th:text="#{electron.commerce.cart.add.label}" th:remove="tag">Add to Cart</i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
