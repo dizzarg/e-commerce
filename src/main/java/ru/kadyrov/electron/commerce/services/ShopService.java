@@ -8,36 +8,38 @@ import ru.kadyrov.electron.commerce.exception.ModelException;
 import ru.kadyrov.electron.commerce.exception.RepositoryException;
 import ru.kadyrov.electron.commerce.exception.ShopServiceException;
 import ru.kadyrov.electron.commerce.models.*;
-import ru.kadyrov.electron.commerce.repository.CustomerRepository;
-import ru.kadyrov.electron.commerce.repository.OrderRepository;
-import ru.kadyrov.electron.commerce.repository.PaymentRepository;
-import ru.kadyrov.electron.commerce.repository.ProductRepository;
+import ru.kadyrov.electron.commerce.repository.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class ShopService {
 
+    private final static Logger logger = LoggerFactory.getLogger(ShopService.class);
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
-
-    private final static Logger logger = LoggerFactory.getLogger(ShopService.class);
+    private final CartRepository cartRepository;
+    @Inject
+    CartService cartService;
 
     @Inject
     public ShopService(@Named("jdbcCustomerRepository") CustomerRepository customerRepository,
                        @Named("jdbcProductRepository") ProductRepository productRepository,
                        @Named("jdbcOrderRepository") OrderRepository orderRepository,
-                       @Named("jdbcPaymentRepository") PaymentRepository paymentRepository) {
+                       @Named("jdbcPaymentRepository") PaymentRepository paymentRepository,
+                       CartRepository cartRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
+        this.cartRepository = cartRepository;
     }
 
     public Product addProduct(ProductContext productParams) {
@@ -61,6 +63,22 @@ public class ShopService {
             logger.error("Could not remove product from Customer Shopping cart: ", e);
             throw new ShopServiceException("Could not add product to customer: " + e.getMessage(), e);
         }
+    }
+
+    public void addProductToCart(int productId, String session, int amount) {
+        try {
+            Product product = productRepository.getProduct(productId);
+            Cart cart = new Cart(session);
+            cart.addItem(product);
+            cartRepository.add(cart);
+        } catch (RepositoryException e) {
+            logger.error("Cannot add product to Customer Shopping cart", e);
+            throw new ShopServiceException("Could not add product to Customer Shopping cart: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Cart> getCarts(String sessionId){
+        return cartRepository.getCarts(sessionId);
     }
 
     public void addProductToCustomer(int productId, String customerUsername, int amount) {
@@ -241,9 +259,6 @@ public class ShopService {
             throw new ShopServiceException("Could not remove order: " + e.getMessage(), e);
         }
     }
-
-    @Inject
-    CartService cartService;
 
     public Cart getCart(String sessionID) {
         return cartService.createCart(sessionID);

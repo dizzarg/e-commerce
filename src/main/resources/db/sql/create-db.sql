@@ -21,7 +21,6 @@ CREATE TABLE customers (
 CREATE TABLE orders (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   customerUsername VARCHAR(30) NOT NULL,
-  products VARCHAR(256),
   dateCreated TIMESTAMP NOT NULL DEFAULT NOW(),
   dateShipped TIMESTAMP
 );
@@ -29,6 +28,7 @@ CREATE TABLE order_items (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   order_id VARCHAR(30) NOT NULL,
   product_id VARCHAR(30) NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 1,
   foreign key (order_id) references orders(id),
   foreign key (product_id) references products(id)
 );

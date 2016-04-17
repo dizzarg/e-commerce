@@ -13,6 +13,7 @@ var ApplicationVM = function (serverModule) {
     self.orders = ko.observableArray([]);
     self.currentOrder = ko.observable();
     self.payments = ko.observableArray([]);
+    self.carts = ko.observableArray([]);
     self.customer = ko.observable();
     self.selectedProduct = ko.observable();
     self.redirectToListPage = function () {
@@ -40,6 +41,9 @@ var ApplicationVM = function (serverModule) {
     self.server.loadCustomer('Vernon', function (data) {
         self.customer(new Customer(data));
     });
+    self.server.loadCarts(function (data) {
+        self.carts(data);
+    });
     self.server.loadProducts(function (data) {
         for (var i = 0; i < data.length; i++) {
             var product = new Product(data[i]);
@@ -65,6 +69,15 @@ var ServerModule = function () {
             }
         });
     };
+
+    self.loadCarts = function (callback) {
+        $.getJSON('/api/shop/carts', function (data) {
+            if (callback) {
+                callback(data)
+            }
+        });
+    };
+
     self.loadOrders = function (userName, callback) {
         $.getJSON('/api/customers/' + userName + '/orders', function (data) {
             if (callback) {

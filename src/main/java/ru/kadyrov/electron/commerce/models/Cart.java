@@ -6,8 +6,8 @@ import java.util.Objects;
 
 public class Cart {
 
-    private List<CartItem> items = new ArrayList<>();
     private final String sessionId;
+    private List<CartItem> items = new ArrayList<>();
 
     public Cart(final String sessionId) {
         this.sessionId = sessionId;
@@ -70,5 +70,9 @@ public class Cart {
         return "Cart{" +
                 "sessionId='" + sessionId + '\'' +
                 '}';
+    }
+
+    public String getSession() {
+        return sessionId;
     }
 }
