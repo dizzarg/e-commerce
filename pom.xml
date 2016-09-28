@@ -6,6 +6,9 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>My electron commerce web application</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <dependencies>
         <!-- Spring -->
         <dependency>
@@ -216,7 +219,7 @@
     		<configuration>
         	    <repoToken>7DdyVUGymYrxUavOCLjtAy2UiJrodco0W</repoToken>
     		</configuration>
-</plugin>
+            </plugin>
         </plugins>
     </build>
 </project>
