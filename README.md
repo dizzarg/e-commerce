@@ -3,7 +3,6 @@
 My electron commerce web application
 
 [![Build Status](https://travis-ci.org/dizzarg/e-commerce.svg?branch=master)](https://travis-ci.org/dizzarg/e-commerce)
-[![codecov](https://codecov.io/gh/dizzarg/e-commerce/branch/master/graph/badge.svg)](https://codecov.io/gh/dizzarg/e-commerce)
 [![Coverage Status](https://coveralls.io/repos/github/dizzarg/e-commerce/badge.svg?branch=master)](https://coveralls.io/github/dizzarg/e-commerce?branch=master)
 
 ## Requirements:
